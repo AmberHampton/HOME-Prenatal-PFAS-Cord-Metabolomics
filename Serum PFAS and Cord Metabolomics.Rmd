@@ -2,7 +2,7 @@
 title: "PFAS and the Metabolome"
 author: "Amber M Hampton and Elvira Fleury"
 date: "2023-08-18"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -68,6 +68,53 @@ These results point to plausible biological mechanisms linking prenatal PFAS exp
 <br>
 <br>
 
+## Reproducibility / How to Run
+```{r end-to-end-workflow, echo=FALSE, fig.align="center", out.width="100%", fig.retina=2}
+knitr::include_graphics("Figures/workflow_end_to_end.png")
+```
+
+<p style="font-size: 12px; line-height: 1.3; margin-top: 6px;">
+  <em><b>Figure note.</b> This figure summarizes the end-to-end workflow, including upstream LC–HRMS processing and downstream statistical analyses. The code in this project starts from the analysis-ready datasets; upstream processing steps are summarized for transparency but are not re-run here.</em>
+</p>
+
+<div style="border: 1px solid #000; padding: 10px; background-color: #FDECEF;">
+  <h3 style="text-align: center"><b>Data Access & Running the Code</b></h3>
+
+  <p><span style="font-size: 15px; font-weight: 800;">Data Access Note</span></p>
+  The data for this study is from the Health Outcomes and Measures of the Environment (HOME) Study [(Braun et al.)](https://pubmed.ncbi.nlm.nih.gov/27006352/). This data is not publicly available. However, the HOME Study principal investigators are actively engaged in collaborative data-sharing projects and welcome new collaborations. Interested investigators can request data access here [(HOME Study Data Request)](https://homestudy.research.cchmc.org/contact). The HOME Study Data Sharing Committee meets regularly to review proposed research projects, ensure that they do not overlap with existing projects, and ensure efficient use of limited resources (e.g., cord blood). This project provides the analysis workflow and figure-generation code; running the full analysis end-to-end requires approved access to the HOME data.
+  <br><br>
+
+  <p><span style="font-size: 15px; font-weight: 800;">Scope Note</span></p>
+  This document is intended as an instructional guide for other scientists performing metabolomics studies. It focuses on the core analysis and reporting steps and does not include every upstream data-processing step (e.g., all data cleaning and preprocessing performed prior to the analysis-ready inputs used here).
+  <br><br>
+
+  <p><span style="font-size: 15px; font-weight: 800;">Project Structure</span></p>
+  <ul>
+    <li><b>Serum PFAS and Cord Metabolomics.Rmd</b> Source R Markdown file with the original analysis code and narrative text</li>
+    <li><b>Serum-PFAS-and-Cord-Metabolomics.html</b> Rendered HTML output of the R Markdown file</li>
+    <li><b>Serum-PFAS-and-Cord-Metabolomics.pdf</b> Rendered PDF output of the R Markdown file</li>
+    <li><b>Figures/</b> Reference figures (mix of code-generated outputs, post-processed/annotated exports, and externally created figures) </li>
+  </ul>
+
+  <p><span style="font-size: 15px; font-weight: 800;">How to Run the Analysis</span></p>
+  <ol>
+    <li>Open the <code>.Rmd</code> and set your local paths (or update <code>root.dir</code>) so the project can find the analysis-ready inputs.</li>
+    <li>Run sections in order: <b>1) Data Import and Data Cleaning, 2) Metabolome Wide Association Study (MWAS), 3) Pathway Enrichment Analysis (PEA)</b>.</li>
+    <li>MWAS outputs are written to <b>Final Datasets/</b> (full results, significant-only results, and MetaboAnalyst/mummichog input files).</li>
+    <li>Pathway enrichment outputs (mummichog results) are saved as <code>.csv</code> files for mixture, single-PFAS, and sensitivity analyses.</li>
+  </ol>
+
+  <p><span style="font-size: 15px; font-weight: 800;">Notes for Reuse</span></p>
+  This workflow can be adapted to other metabolomics MWAS settings by updating:
+  <ul>
+    <li>exposure names (PFAS variables),</li>
+    <li>covariates included in the models, and</li>
+    <li>file paths for imports/exports.</li>
+  </ul>
+</div>
+
+<br>
+<br>
 
 ## 0. Project Overview
 
@@ -826,49 +873,3 @@ write.csv(mummi_results_5pfas, "/Users/amber/Desktop/mummi_5pfas_res.csv")
 #Removing datasets and values that are not needed
 rm(all.mzsn, mdata.all, mdata.siggenes, metaboanalyst_env, mSet5, anal.type, api.base, meta.selected, module.count, msg.vec, primary.user, smpdbpw.count, url.pre, results_list)
 ```
-
-## Reproducibility / How to Run
-```{r end-to-end-workflow, echo=FALSE, fig.align="center", out.width="180%", fig.retina=2}
-knitr::include_graphics("Figures/workflow_end_to_end.png")
-```
-
-<p style="font-size: 12px; line-height: 1.3; margin-top: 6px;"> <em><b>Figure note.</b> This figure shows the end-to-end workflow, including upstream LC–HRMS processing and downstream statistical analyses. The code in this repository starts from the analysis-ready datasets; upstream processing steps are summarized for transparency but are not re-run here.</em> </p>
-
-<div style="border: 1px solid #000; padding: 10px; background-color: #FDECEF;">
-  <h3 style="text-align: center"> <b>Data Access & Running the Code</b> </h3>
-
-  <p><span style="font-size: 15px; font-weight: 800;">Data Access Note</span></p>
-The data for this study is from the Health Outcomes and Measures of the Environment (HOME) Study [(Braun et al.)](https://pubmed.ncbi.nlm.nih.gov/27006352/). This data is not publicly available. However, the HOME Study principal investigators are actively engaged in collaborative data-sharing projects and welcome new collaborations. Interested investigators can request data access here [(HOME Study Data Request)](https://homestudy.research.cchmc.org/contact). The HOME Study Data Sharing Committee meets regularly to review proposed research projects, ensure that they do not overlap with existing projects, and ensure efficient use of limited resources (e.g., cord blood). This project provides the analysis workflow and figure-generation code; running the full analysis end-to-end requires approved access to the HOME data.
-  <br><br>
-
-  <p><span style="font-size: 15px; font-weight: 800;">Scope Note</span></p>
-  This document is intended as an instructional guide for other scientists performing metabolomics studies. It focuses on the core analysis and reporting steps and does not include every upstream data-processing step (e.g., all data cleaning and preprocessing performed prior to the analysis-ready inputs used here).
-  <br><br>
-
-  <p><span style="font-size: 15px; font-weight: 800;">Project Structure</span></p>
-  <ul>
-    <li><b>Data/</b> — analysis-ready input files (metabolomics feature tables and map files, PFAS exposures, covariates)</li>
-    <li><b>Final Datasets/</b> — MWAS results and files formatted for pathway enrichment</li>
-    <li><b>figures/</b> — saved figures generated from scripts</li>
-    <li><b>R/</b> (optional) — helper functions/scripts (if you choose to separate them from the Rmd)</li>
-  </ul>
-
-  <p><span style="font-size: 15px; font-weight: 800;">How to Run the Analysis</span></p>
-  <ol>
-    <li>Open the <code>.Rmd</code> and set your local paths (or update <code>root.dir</code>) so the project can find the files in <b>Data/</b>.</li>
-    <li>Run sections in order: <b>1) Data Import and Data Cleaning, 2) Metabolome Wide Association Study (MWAS), 3) Pathway Enrichment Analysis (PEA)</b>.</li>
-    <li>MWAS outputs are written to <b>Final Datasets/</b> (full results, significant-only results, and MetaboAnalyst/mummichog input files).</li>
-    <li>Pathway enrichment outputs (mummichog results) are saved as <code>.csv</code> files for mixture, single-PFAS, and sensitivity analyses.</li>
-  </ol>
-
-  <p><span style="font-size: 15px; font-weight: 800;">Notes for Reuse</span></p>
-  This workflow can be adapted to other metabolomics MWAS settings by updating:
-  <ul>
-    <li>exposure names (PFAS variables),</li>
-    <li>covariates included in the models, and</li>
-    <li>file paths for imports/exports.</li>
-  </ul>
-</div>
-
-<br>
-<br>
