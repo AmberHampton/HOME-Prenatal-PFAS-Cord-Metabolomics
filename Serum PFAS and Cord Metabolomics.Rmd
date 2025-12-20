@@ -1,6 +1,6 @@
 ---
 title: "PFAS and the Metabolome"
-author: "Amber M Hall and Elvira Fleury"
+author: "Amber M Hampton and Elvira Fleury"
 date: "2023-08-18"
 output: html_document
 ---
@@ -11,19 +11,72 @@ rm(list = ls(all.names = TRUE))
 
 #Setting the working dictionary to a pathway on my computer
 library(knitr) 
-knitr::opts_knit$set(root.dir = '/Users/amber/Desktop/Metabolomics/Analyses', tidy=TRUE)
+knitr::opts_knit$set(root.dir = '/Users/amber/Desktop/Metabolomics/Github', tidy=TRUE)
 ```
 
 #  {.tabset}
 
-## Introduction
+## Executive Summary
+<div style="border: 1px solid #000; padding: 10px; background-color: #FDECEF;">
+ <h3 style="text-align: center"> Executive Summary </h3>
 
-This code was written for the paper "Associations of a Prenatal Serum Per- and Polyfluoroalkyl Substance Mixture with the Cord Serum Metabolome in the HOME Study" by Hall et al. Details for this study can be found here [(Hall et al.)]https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515). In brief, the purpose of this research was to evaluate associations between a mixture of 4 PFAS [perfluorooctanesulfonic acid (PFOS), perfluorooctanoic acid (PFOA), perfluorohexanesulfonic acid (PFHxS), and perfluorononanoic acid (PFNA)] measured at 16 weeks' gestation and cord serum metabolites. The metabolites were identified using an untargeted analysis approach. Additionally, we examined each PFAS individually and included *N*-methylperfluorooctane sulfonamido acetic acid (MeFOSAA) in the mixture analysis to gain insight into their potential influence on the mixture in secondary and sensitivity analyses, respectively.
+<p><span style="font-size: 16px; font-weight: 800;">**Background**</span></p>
+Per- and polyfluoroalkyl substances (PFAS) are widespread, persistent synthetic chemicals used in many consumer and industrial products. Prenatal exposure has been linked to adverse health outcomes, but the biological mechanisms underlying these associations are unclear. Untargeted metabolomics can profile thousands of small molecules (metabolites) in blood, offering a way to identify early-life biochemical changes associated with prenatal PFAS exposure.
+<br>
+<div style="border-left: 3px solid #000; padding: 8px 10px; background-color: #F8BBD0; margin-top: 8px;">
+  <p><span style="font-size: 15px; font-weight: 800;">**Objective**</span></p>
 
-The code provided here is the corresponding code for our analyses. Functions performed using this code can be seen in the box below. 
+Identify cord-serum metabolomic features and metabolic pathways associated with prenatal PFAS exposure to understand how prenatal exposure to PFAS may influence early-life biology. 
+</div>
+<br>
+<p><span style="font-size: 15px; font-weight: 800;">**Data**</span></p>
+
+We analyzed 264 mother–infant dyads in the HOME Study. Four prenatal serum PFAS were measured at ~16 weeks’ gestation (PFOS, PFOA, PFHxS, PFNA). Cord serum was profiled using LC-HRMS, yielding 14,402 metabolomic features (ions). Features were putatively annotated using the Human Metabolome Database (HMDB). 
+
+<p><span style="font-size: 15px; font-weight: 800;">**Approach**</span></p>
+
+<u>Mixture MWAS (primary):</u> Quantile-based g-computation to estimate the joint effect of the 4-PFAS mixture on each metabolomic feature, adjusted for maternal age, race/ethnicity, parity, household income, and smoking status/cotinine.
+
+<u>Single-pollutant MWAS (secondary):</u> Covariate-adjusted linear models for each PFAS individually to contextualize mixture results and identify PFAS-specific signals.
+
+<u>Multiple-testing control:</u> A false discovery rate (FDR; Benjamini–Hochberg) correction across MWAS results to account for thousands of tests.
+
+<u>Biological interpretation:</u> Mummichog pathway enrichment analysis on MWAS outputs to identify pathways most consistently implicated by PFAS exposure.
+
+<u>Sensitivity analysis:</u> Re-ran the mixture MWAS with MeFOSAA added (5-PFAS mixture) and repeated mummichog pathway enrichment to assess the robustness of the primary findings.
+
+<u>Implementation:</u> Analyses were implemented in R using modular scripts/functions to support reproducibility and consistent analysis across thousands of features. Key outputs include MWAS and pathway-enrichment visualizations, plus sensitivity analyses evaluating robustness to mixture specification.
+
+<p><span style="font-size: 15px; font-weight: 800;">**Key Results**</span></p>
+
+The 4-PFAS mixture was associated with four cord-serum features (FDR < 0.20): PFOS, PFHxS, a putatively identified thyroid-related metabolite (3-monoiodo-L-thyronine 4-O-sulfate), and one unidentified feature (m/z 590.0020; RT 441.4 s). 
+
+Pathway enrichment linked the PFAS-mixture to 49 metabolic pathways (p < 0.05), with strongest representation in amino acid, carbohydrate, lipid, cofactor/vitamin metabolism, and glycan biosynthesis/metabolism. Several pathways were consistently enriched across mixture and single-PFAS results (e.g., TCA cycle, keratan sulfate degradation, phytanic acid peroxisomal oxidation), pointing to common metabolic themes. 
+
+Adding MeFOSAA (5-PFAS mixture) produced similar pathway-enrichment patterns, supporting the robustness of the primary findings.
+<br>
+
+<div style="border-left: 3px solid #000; padding: 8px 10px; background-color: #F8BBD0; margin-top: 8px;">
+  <p><span style="font-size: 15px; font-weight: 800;">**Why it matters**</span></p>
+These results point to plausible biological mechanisms linking prenatal PFAS exposure to altered neonatal metabolism. Next steps include formal mediation analyses to evaluate whether these pathways help explain PFAS associations with outcomes such as birthweight or vaccine response.
+</div>
+
+<br>
+**Reproducibility Note.** HOME Study data is restricted; this project emphasizes transparent, modular analysis code and reproducible figure generation.
+</div>
+
+<br>
+<br>
+
+
+## 0. Project Overview
+
+This code was written for the paper "Associations of a Prenatal Serum Per- and Polyfluoroalkyl Substance Mixture with the Cord Serum Metabolome in the HOME Study" by Hall et al. Details for this study can be found here [(Hall et al.)](https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515). In brief, the purpose of this research was to evaluate associations between a mixture of 4 PFAS [perfluorooctanesulfonic acid (PFOS), perfluorooctanoic acid (PFOA), perfluorohexanesulfonic acid (PFHxS), and perfluorononanoic acid (PFNA)] measured at 16 weeks' gestation and cord serum metabolites. The metabolites were identified using an untargeted analysis approach. Additionally, we examined each PFAS individually and included *N*-methylperfluorooctane sulfonamido acetic acid (MeFOSAA) in the mixture analysis to gain insight into their potential influence on the mixture in secondary and sensitivity analyses, respectively.
+
+The code provided here is the corresponding code for our analyses. The workflow and outputs producted by this code can be seen below.
 
 <div style="border: 1px solid #000; padding: 10px; background-color: #F8BBD0">
-  <h3 style="text-align: center"> **Functions Performed Using this Code** </h3>
+  <h3 style="text-align: center"> **Workflow and Outputs** </h3>
   **1.  Data Import and Cleaning**
   <ul><li>Cleans and structures data for analyses.</li></ul>
   **2.  Metabolome Wide Association Study (MWAS)**   
@@ -37,7 +90,7 @@ The code provided here is the corresponding code for our analyses. Functions per
   <ul><li><u>Section 3.4</u> Performs a PEA using *mummichog* via Metaboanalyst 3.2 to identify the association between a 5-PFAS mixture and specific metabolic pathways. This dataset was created during the MWAS of the 5-PFAS mixture (Section 2.3). This was a sensitivity analysis to determine the impact of MeFOSAA on our final results.</li></ul>
 </div>
 <br>
-**The data for this study is from the Health Outcomes and Measures of the Environment (HOME) Study [(Braun et al.)](https://pubmed.ncbi.nlm.nih.gov/27006352/). This data is not publically available. However, the HOME Study principal investigators actively engaged in collaborative data-sharing projects and welcome new collaborations. Interested investigators can request data access here [(HOME Study Data Request)](https://homestudy.research.cchmc.org/contact). The HOME Study Data Sharing Committee meets regularly to review proposed research projects, ensure that they do not overlap with extant projects, and are an efficient use of scarce resources (e.g. cord blood).**
+**Data Access.** The HOME Study data is restricted. See “Reproducibility / How to Run” for access details and how to run this project.
 <br>
 <br>
 <br>
@@ -111,16 +164,17 @@ For the map files, the headers are detailed in the box below.
   <div style="border: 1px solid #000; padding: 10px; background-color: #F8BBD0; width: 500px">
   <div style="text-align: left; text-indent: 10px">
 <h4 style="text-align: center">**IMPORTANT**</h4> 
-<h5 style="text-align: center">**For our data, both HILIC and C18 datasets had already:**</h5>   
+<h5 style="text-align: center">**For this study, I performed the following pre-analysis processing steps for both HILIC and C18 data:**</h5>   
   </div>
   <ul>
-  <li>been batch corrected using WaveICA 2.0 [(Deng et al.)](https://pubmed.ncbi.nlm.nih.gov/34542717/) </li>
-  <li>had values removed if CV >30% (within triplicate) </li>
-  <li>had values removed if non-detect intensities >20% </li>
-  <li>had missing values imputed using:   
+  <li>Batch corrected using WaveICA 2.0 [(Deng et al.)](https://pubmed.ncbi.nlm.nih.gov/34542717/) </li>
+  <li>Removed if CV >30% (within triplicate) </li>
+  <li>Removed values when non-detect intensities >20% </li>
+  <li>Imputed missing values using:   
   <br>
   $\begin{aligned}\small\frac{\text{the minimum value per feature}}{\sqrt{2}}\end{aligned}$
   </li>
+  <li>l=log2 transformed </li>
   </div>
   </div>
 <br>
@@ -149,11 +203,11 @@ The headers for *pfas_only* are in the box below.
 <h6 style="text-align: center">**Dataframe Name: **<b><i>pfas_only</i></b></h6>
   <p style="margin: 0; text-indent: 25px"> <u>column 1</u>. *participant_ID*: the assigned participant ID for the data in this study. This was used to merge with the metabolomics data. 
   <p style="margin: 0; text-indent: 100px"> 'participant ID later.
-  <p style="margin: 0; text-indent: 25px"> <u>column 2</u>. *pfoa_log2*: log-2 transformed serum PFOA concentrations (ng/mL).
-  <p style="margin: 0; text-indent: 25px"> <u>column 3</u>. *pfos_log2*: log-2 transformed serum PFOS concentrations (ng/mL).
-  <p style="margin: 0; text-indent: 25px"> <u>column 4</u>. *pfna_log2*: log-2 transformed serum PFNA concentrations (ng/mL).
-  <p style="margin: 0; text-indent: 25px"> <u>column 5</u>. *pfhxs_log2*: log-2 transformed serum PFHxS concentrations (ng/mL).
-  <p style="margin: 0; text-indent: 25px"> <u>column 6</u>. *me_pfosa_acoh_log2*: log-2 transformed serum MeFOSAA concentrations (ng/mL).
+  <p style="margin: 0; text-indent: 25px"> <u>column 2</u>. *pfoa_log2*: log2 transformed serum PFOA concentrations (ng/mL).
+  <p style="margin: 0; text-indent: 25px"> <u>column 3</u>. *pfos_log2*: log2 transformed serum PFOS concentrations (ng/mL).
+  <p style="margin: 0; text-indent: 25px"> <u>column 4</u>. *pfna_log2*: log2 transformed serum PFNA concentrations (ng/mL).
+  <p style="margin: 0; text-indent: 25px"> <u>column 5</u>. *pfhxs_log2*: log2 transformed serum PFHxS concentrations (ng/mL).
+  <p style="margin: 0; text-indent: 25px"> <u>column 6</u>. *me_pfosa_acoh_log2*: log2 transformed serum MeFOSAA concentrations (ng/mL).
   </div>
 <br>
 
@@ -172,7 +226,7 @@ For *cov*, the headers are as follows:
 <h6 style="text-align: center">**Dataframe Name: **<b><i>cov</i></b></h6>
   <p style="margin: 0; text-indent: 25px"> <u>column 1.</u> *participant_ID*: The assigned participant ID for the data in this study.
   <p style="margin: 0; text-indent: 25px"> <u>column 2.</u> *momagedeliv*: maternal age at delivery (years).
-  <p style="margin: 0; text-indent: 25px"> <u>column 3.</u> *ct_16w*: log10 transformed serum cotinine concentrations measured at 16 weeks' gestation (ng/mL).
+  <p style="margin: 0; text-indent: 25px"> <u>column 3.</u> *ct_16w*: log-10 transformed serum cotinine concentrations measured at 16 weeks' gestation (ng/mL).
   <p style="margin: 0; text-indent: 25px"> <u>column 4.</u> *mom_race*: maternal race (coded as "White, not-Hispanic" and "Other race").
   <p style="margin: 0; text-indent: 25px"> <u>column 5.</u> *midincome*: family income in USD (continuous).
   <p style="margin: 0; text-indent: 25px"> <u>column 6.</u> *parity*: parity (coded as "Nulliparous" and "Parous").
@@ -309,7 +363,7 @@ The purpose of quantile-based g-computation (QGComp) is to examine the joint eff
 <br>
 </div>
 ### 2.1. MWAS for the 4-PFAS Mixture (Quantile-Based g-Computation)
-This chunk of code is the primary Metabolome Wide Association Study (MWAS) analysis for our study **(study under review)**. We evaluated whether the joint effect of our 4 PFAS of interest (PFOS, PFOA, PFHxS, PFNA) were associated with the ion abundance for each feature, adjusting for parity, family income, maternal age, maternal race, and cotinine concentrations. 
+This chunk of code is the primary Metabolome Wide Association Study (MWAS) analysis for our study  [(Hall et al.)](https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515). We evaluated whether the joint effect of our 4 PFAS of interest (PFOS, PFOA, PFHxS, PFNA) were associated with the ion abundance for each feature, adjusting for parity, family income, maternal age, maternal race, and cotinine concentrations. 
 
 The results of these models are outputted to 3 files, detailed in the box below. 
 
@@ -357,7 +411,6 @@ find_psi_4PFAS <- function(list) {
     res_mat[i, 5:6] <- res$ci # upper and lower confidence interval
     res_mat[i, 7] <- as.numeric(res$pval[2]) # p-value
     res_mat[i, 8] <- as.numeric(list[[i]][1, 4]) # mode
-  , eval=FALSE}
   # Applying the False Discovery Rate (FDR) correction
   res_df <- data.frame(res_mat)
   res_df$FDR <- p.adjust(res_df$p.value, method = 'BH')
@@ -365,7 +418,6 @@ find_psi_4PFAS <- function(list) {
   res_df$mode[res_df$mode == 1] <- "negative"
   res_df$mode[res_df$mode == 2] <- "positive"
   return(res_df)
-, eval=FALSE}
 
 # Creating files
 qg_comp_4_FULL <- suppressWarnings(as.data.frame(find_psi_4PFAS(split_pfas)))
@@ -428,7 +480,6 @@ find_linear_pfas <- function(list, PFAS) {
     res_mat[i, 5:6] <- confint(res, PFAS, level = 0.95) #upper and lower confidence interval
     res_mat[i, 7] <- summary(res)$coefficients[PFAS, "Pr(>|t|)"] #p-value
     res_mat[i, 8] <- as.numeric(list[[i]][1, 4]) #mode (i.e. direction)
-  , eval=FALSE}
   # Converting matrix to data frame and add FDR column
   res_df <- as.data.frame(res_mat)
   colnames(res_df) <- colnames(res_mat)
@@ -438,7 +489,6 @@ find_linear_pfas <- function(list, PFAS) {
   res_df$mode[res_df$mode == 2] <- "positive" #HILIC
   #Returns your wanted values
   return(res_df)
-, eval=FALSE}
 
 # Creating the datafiles
   # PFOA
@@ -551,7 +601,6 @@ find_psi_4PFAS_and_ME_PFOSA <- function(list) {
     res_mat[i, 5:6] <- res$ci # upper and lower confidence interval
     res_mat[i, 7] <- as.numeric(res$pval[2]) # p-value
     res_mat[i, 8] <- as.numeric(list[[i]][1, 4]) # mode
-  , eval=FALSE}
   # Applying the FDR correction
   res_df <- data.frame(res_mat)
   res_df$FDR <- p.adjust(res_df$p.value, method = 'BH')
@@ -559,7 +608,6 @@ find_psi_4PFAS_and_ME_PFOSA <- function(list) {
   res_df$mode[res_df$mode == 1] <- "negative"
   res_df$mode[res_df$mode == 2] <- "positive"
   return(res_df)
-, eval=FALSE}
 
 # Creating files
 qg_comp_5_FULL <- suppressWarnings(as.data.frame(find_psi_4PFAS_and_ME_PFOSA(split_pfas)))
@@ -604,7 +652,7 @@ add.vec <- c("M+FA-H [1-]","M-H [1-]","2M-H [1-]","M-H+O [1-]","M(C13)-H [1-]",
 
 Using the results from the 4-PFAS Mixture MWAS (Section 2.1), we conducted a *mummichog* PEA to identify enriched pathways using MetaboAnalystR. 
 
-Details regarding our untargeted analysis are described in detail in our paper (**paper under review**). From this information, we restricted to adducts that could potentially form based on our mobile phases and internal standards (the specific adducts used in our analyses are detailed in the box below). This PEA was conducted using the human MFN network, a mass tolerance of 5ppm, 10,000 permutations and a p-value cutoff <0.05 to delineate between significantly enriched and non-significantly enriched features. Furthermore, this analysis was restricted to metabolite data sets containing at least 3 entries. A p(gamma) < 0.05 was considered statistically significant.   
+Details regarding our untargeted analysis are described in detail in our paper  [(Hall et al.)](https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515). From this information, we restricted to adducts that could potentially form based on our mobile phases and internal standards (the specific adducts used in our analyses are detailed in the box below). This PEA was conducted using the human MFN network, a mass tolerance of 5ppm, 10,000 permutations and a p-value cutoff <0.05 to delineate between significantly enriched and non-significantly enriched features. Furthermore, this analysis was restricted to metabolite data sets containing at least 3 entries. A p(gamma) < 0.05 was considered statistically significant.   
 <br>
 
 <div style="border: 1px solid #000; padding: 10px; text-align: center">
@@ -666,7 +714,7 @@ rm(all.mzsn, mdata.all, mdata.siggenes, metaboanalyst_env, mSet4, mummi_results_
 
 Using the results from the single pollutant MWAS models (Section 2.2), we conducted a *mummichog* PEA to identify enriched pathways using MetaboAnalystR. This was part of a secondary analysis that evaluated the impact of individual PFAS on the PEA of the 4-PFAS mixture (this is discussed in Section 3.2).
 
-Details regarding our untargeted analysis are described in detail in our paper (**paper under review**). From this, we restricted to adducts that could potentially form based on our mobile phases and internal standards (the specific adducts used in our analyses are detailed in the box below). This PEA was conducted using the human MFN network, a mass tolerance of 5ppm, 10,000 permutations and a p-value cutoff <0.05 to delineate between significantly enriched and non-significantly enriched features. Furthermore, this analysis was restricted to metabolite data sets containing at least 3 entries. A p(gamma) < 0.05 was considered statistically significant. 
+Details regarding our untargeted analysis are described in detail in our paper  [(Hall et al.)](https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515). From this, we restricted to adducts that could potentially form based on our mobile phases and internal standards (the specific adducts used in our analyses are detailed in the box below). This PEA was conducted using the human MFN network, a mass tolerance of 5ppm, 10,000 permutations and a p-value cutoff <0.05 to delineate between significantly enriched and non-significantly enriched features. Furthermore, this analysis was restricted to metabolite data sets containing at least 3 entries. A p(gamma) < 0.05 was considered statistically significant. 
 
 <div style="border: 1px solid #000; padding: 10px; text-align: center;">
   <p><strong>Adducts We Restricted to in Our Analyses</strong></p>
@@ -714,7 +762,6 @@ for (PFAS in PFAS) {
   results_list[[PFAS]] <- results_list[[PFAS]][results_list[[PFAS]]$Gamma < 0.05, ]
   # Storing the results as a .csv
   write.csv(results_list[[PFAS]], paste("mummi_", PFAS, "_res.csv", sep = ""))
-, eval=FALSE}
 # Removing unneeded datasets and values
 rm(all.mzsn, mdata.all, mdata.siggenes, metaboanalyst_env, mSet, anal.type, api.base, file_path, meta.selected, module.count, msg.vec, PFAS, primary.user, smpdbpw.count, url.pre, mummi_results_4pfas)
 ```
@@ -723,7 +770,7 @@ rm(all.mzsn, mdata.all, mdata.siggenes, metaboanalyst_env, mSet, anal.type, api.
 
 Using the results from the 5-PFAS Mixture MWAS (Section 2.3), we conducted a *mummichog* PEA to identify enriched pathways using MetaboAnalystR. This was a sensitivity analysis to determine the impact of MeFOSAA on the PEA of our 4-PFAS mixture (this is discussed in Section 3.2). 
 
-Details regarding our untargeted analysis are described in detail in our paper (**paper under review**). From this information, we restricted to adducts that could potentially form based on our mobile phases and internal standards (the specific adducts used in our analyses are detailed in the box below). This PEA was conducted using the human MFN network, a mass tolerance of 5ppm, 10,000 permutations and a p-value cutoff <0.05 to delineate between significantly enriched and non-significantly enriched features. Furthermore, this analysis was restricted to metabolite data sets containing at least 3 entries. A p(gamma) < 0.05 was considered statistically significant.   
+Details regarding our untargeted analysis are described in detail in our paper  [(Hall et al.)](https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515). From this information, we restricted to adducts that could potentially form based on our mobile phases and internal standards (the specific adducts used in our analyses are detailed in the box below). This PEA was conducted using the human MFN network, a mass tolerance of 5ppm, 10,000 permutations and a p-value cutoff <0.05 to delineate between significantly enriched and non-significantly enriched features. Furthermore, this analysis was restricted to metabolite data sets containing at least 3 entries. A p(gamma) < 0.05 was considered statistically significant.   
 
 <div style="border: 1px solid #000; padding: 10px; text-align: center;">
   <p><strong>Adducts We Restricted to in Our Analyses</strong></p>
@@ -774,8 +821,54 @@ mummi_results_5pfas<- as.data.frame(mSet5$mummi.resmat)
 mummi_results_5pfas <- mummi_results_5pfas[mummi_results_5pfas$Gamma< 0.05, ]
 
 # Storing the results as a .csv
-write.csv(mummi_results_4pfas, "/Users/amber/Desktop/mummi_4pfas_res.csv")
+write.csv(mummi_results_5pfas, "/Users/amber/Desktop/mummi_5pfas_res.csv")
 
 #Removing datasets and values that are not needed
 rm(all.mzsn, mdata.all, mdata.siggenes, metaboanalyst_env, mSet5, anal.type, api.base, meta.selected, module.count, msg.vec, primary.user, smpdbpw.count, url.pre, results_list)
 ```
+
+## Reproducibility / How to Run
+```{r end-to-end-workflow, echo=FALSE, fig.align="center", out.width="180%", fig.retina=2}
+knitr::include_graphics("Figures/workflow_end_to_end.png")
+```
+
+<p style="font-size: 12px; line-height: 1.3; margin-top: 6px;"> <em><b>Figure note.</b> This figure shows the end-to-end workflow, including upstream LC–HRMS processing and downstream statistical analyses. The code in this repository starts from the analysis-ready datasets; upstream processing steps are summarized for transparency but are not re-run here.</em> </p>
+
+<div style="border: 1px solid #000; padding: 10px; background-color: #FDECEF;">
+  <h3 style="text-align: center"> <b>Data Access & Running the Code</b> </h3>
+
+  <p><span style="font-size: 15px; font-weight: 800;">Data Access Note</span></p>
+The data for this study is from the Health Outcomes and Measures of the Environment (HOME) Study [(Braun et al.)](https://pubmed.ncbi.nlm.nih.gov/27006352/). This data is not publicly available. However, the HOME Study principal investigators are actively engaged in collaborative data-sharing projects and welcome new collaborations. Interested investigators can request data access here [(HOME Study Data Request)](https://homestudy.research.cchmc.org/contact). The HOME Study Data Sharing Committee meets regularly to review proposed research projects, ensure that they do not overlap with existing projects, and ensure efficient use of limited resources (e.g., cord blood). This project provides the analysis workflow and figure-generation code; running the full analysis end-to-end requires approved access to the HOME data.
+  <br><br>
+
+  <p><span style="font-size: 15px; font-weight: 800;">Scope Note</span></p>
+  This document is intended as an instructional guide for other scientists performing metabolomics studies. It focuses on the core analysis and reporting steps and does not include every upstream data-processing step (e.g., all data cleaning and preprocessing performed prior to the analysis-ready inputs used here).
+  <br><br>
+
+  <p><span style="font-size: 15px; font-weight: 800;">Project Structure</span></p>
+  <ul>
+    <li><b>Data/</b> — analysis-ready input files (metabolomics feature tables and map files, PFAS exposures, covariates)</li>
+    <li><b>Final Datasets/</b> — MWAS results and files formatted for pathway enrichment</li>
+    <li><b>figures/</b> — saved figures generated from scripts</li>
+    <li><b>R/</b> (optional) — helper functions/scripts (if you choose to separate them from the Rmd)</li>
+  </ul>
+
+  <p><span style="font-size: 15px; font-weight: 800;">How to Run the Analysis</span></p>
+  <ol>
+    <li>Open the <code>.Rmd</code> and set your local paths (or update <code>root.dir</code>) so the project can find the files in <b>Data/</b>.</li>
+    <li>Run sections in order: <b>1) Data Import and Data Cleaning, 2) Metabolome Wide Association Study (MWAS), 3) Pathway Enrichment Analysis (PEA)</b>.</li>
+    <li>MWAS outputs are written to <b>Final Datasets/</b> (full results, significant-only results, and MetaboAnalyst/mummichog input files).</li>
+    <li>Pathway enrichment outputs (mummichog results) are saved as <code>.csv</code> files for mixture, single-PFAS, and sensitivity analyses.</li>
+  </ol>
+
+  <p><span style="font-size: 15px; font-weight: 800;">Notes for Reuse</span></p>
+  This workflow can be adapted to other metabolomics MWAS settings by updating:
+  <ul>
+    <li>exposure names (PFAS variables),</li>
+    <li>covariates included in the models, and</li>
+    <li>file paths for imports/exports.</li>
+  </ul>
+</div>
+
+<br>
+<br>
