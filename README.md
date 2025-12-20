@@ -1,6 +1,6 @@
 # HOME-Prenatal-PFAS-Cord-Metabolomics
 
-Code and rendered workflow for:
+Code and rendered workflow for my first author paper:
 
 Hall, Amber M., et al. “Associations of a Prenatal Serum Per- and Polyfluoroalkyl Substance Mixture with the Cord Serum Metabolome in the HOME Study.” *Environmental Science & Technology* 57(51) (2023): 21627–21636.
 
