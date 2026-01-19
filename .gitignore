@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# R session / history / temp files
+.Rhistory
+.RData
+.RData.bak
+.RDataTmp*
