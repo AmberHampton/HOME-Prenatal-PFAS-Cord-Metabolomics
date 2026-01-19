@@ -74,13 +74,13 @@ These results point to plausible biological mechanisms linking prenatal PFAS exp
 <span style="font-size: 15px; font-weight: 800;">Data Access Note.</span>
 The data for this study is from the Health Outcomes and Measures of the Environment (HOME) Study [(Braun et al.)](https://pubmed.ncbi.nlm.nih.gov/27006352/). This data is not publicly available. However, the HOME Study principal investigators are actively engaged in collaborative data-sharing projects and welcome new collaborations. Interested investigators can request data access here [(HOME Study Data Request)](https://homestudy.research.cchmc.org/contact). The HOME Study Data Sharing Committee meets regularly to review proposed research projects, ensure that they do not overlap with existing projects, and ensure efficient use of limited resources (e.g., cord blood). <br>
 
-<span style="font-size: 15px; font-weight: 800;">How to Run the Analysis</span>
+<span style="font-size: 15px; font-weight: 800;">How to Run the Figures and Table</span>
 <ol>
   <li>
-    Open the <code>.Rmd</code> and set your local paths (or update <code>root.dir</code>) so the project can find the analysis-ready inputs.
+    Open the <code>.Rmd</code> and set your local paths so the project can find the analysis-ready inputs.
   </li>
   <li>
-    Run sections in order:
+    Run the analysis sections in order:
     <ol style="margin-top: 6px; margin-left: 22px;">
       <li>Data Import & Data Cleaning</li>
       <li>Metabolome Wide Association Study (MWAS)</li>
@@ -95,6 +95,17 @@ The data for this study is from the Health Outcomes and Measures of the Environm
   </li>
 </ol>
 
+<span style="font-size: 15px; font-weight: 800;">How to Run the Figures and Table</span>
+<ol>
+  <li>
+    Open the <code>.Rmd</code> and set your local paths so the project can find the analysis-ready inputs.
+  </li>
+  <li> Exploratory Data Analysis (EDA) figures and the summary table can be generated independently and do not require any upstream computations. All other figures are downstream artifacts and depend on the successful completion of their corresponding analyses. For example, Metabolome-Wide Association Study (MWAS) analyses must be run prior to generating MWAS figures, and Pathway Enrichment Analysis outputs must be produced before creating their associated visualizations.
+  </li>
+  <li>
+    Tables and figures are generated directly within the notebook and rendered on knit. If users wish to save outputs to disk, standard R export functions (e.g., ggsave() for figures or write.csv() for tables) can be used to write results to a desired directory such as <b>Final Datasets/</b>.
+  </li>
+</ol>
 
 <span style="font-size: 15px; font-weight: 800;">Notes for Reuse.</span>
 This workflow can be adapted to other metabolomics MWAS settings by updating:
@@ -125,7 +136,6 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
 
 <h2 style="text-align: center"><b>Workflow & Deliverables</b></h2>
 <div style="border: 1px solid #000; padding: 10px; background-color: #FDECEF">
-<br><br>
 <h3 style="font-weight: 800;">Analysis Code</h3>
 <span style="font-size: 15px; font-weight: 800;">1. Data Import & Cleaning</span>
 <div style="margin-left: 1.2em;">
@@ -137,25 +147,23 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
   <u>Section 2.1</u> Conducts an MWAS using quantile-based g-computation
   (<a href="https://ehp.niehs.nih.gov/doi/full/10.1289/EHP5838">Keil et al.</a>).
   This evaluates associations between a 4-PFAS mixture (PFOS, PFOA, PFNA, PFHxS)
-  and each cord serum metabolite.
+  and each cord serum metabolite.*
 </div>
-<br>
 <div style="margin-left: 1.2em;">
   <u>Section 2.2</u> Conducts an MWAS using linear regression to identify
   individual associations between each PFAS and each metabolite. The purpose
   of this analysis was to contextualize mixture results and identify
-  PFAS-specific signals.
+  PFAS-specific signals.*
 </div>
-<br>
 <div style="margin-left: 1.2em;">
   <u>Section 2.3</u> Conducts an MWAS using quantile-based g-computation to
   evaluate associations between a 5-PFAS mixture (4-PFAS mixture plus MeFOSAA)
   and each metabolite. This serves as a sensitivity analysis to assess the
-  impact of MeFOSAA on the primary findings.
+  impact of MeFOSAA on the primary findings.*
 </div>
-<br>
 <div style="margin-left: 1.2em;">
-  <em>Note:</em> These analyses use the Benjamini–Hochberg false discovery rate
+<br>
+  <em>*Note:</em> These analyses use the Benjamini–Hochberg false discovery rate
   (BH FDR). An FDR &lt; 0.20 was used as an exploratory threshold to retain a
   broader set of candidate metabolic features for follow-up investigation.
 </div>
@@ -167,14 +175,12 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
   PFHxS) (<a href="https://pubmed.ncbi.nlm.nih.gov/23861661/">Li et al.</a>).
   Input data were generated during the 4-PFAS MWAS (Section 2.1).
 </div>
-<br>
 <div style="margin-left: 1.2em;">
   <u>Section 3.3</u> Performs a PEA using <em>mummichog</em> via MetaboAnalyst 3.2
   for each individual PFAS. Input data were generated during the single-PFAS
   MWAS (Section 2.2) to evaluate PFAS-specific pathway patterns relative to the
   mixture.
 </div>
-<br>
 <div style="margin-left: 1.2em;">
   <u>Section 3.4</u> Performs a PEA using <em>mummichog</em> via MetaboAnalyst 3.2
   for a 5-PFAS mixture. Input data were generated during the 5-PFAS MWAS
@@ -190,65 +196,59 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
   maternal serum PFAS concentrations (PFOS, PFOA, PFNA, PFHxS, MeFOSAA) to
   summarize correlation structure across compounds.
 </div>
-<br>
 <div style="margin-left: 1.2em;">
   <u>Section 4.2</u> Displays PFAS violin plots with boxplot overlays to visualize
   the distribution of prenatal PFAS concentrations. Because PFAS concentrations
   differ substantially in scale, a median (IQR) table is included beneath the
   figure to aid interpretation.
 </div>
-<br>
 <div style="margin-left: 1.2em;">
-  <u>Section 4.3</u> Displays a descriptive Table 1 summarizing maternal and
+  <u>Section 4.3</u> Displays a descriptive table summarizing maternal and
   household characteristics in the HOME Study (2003–2006), with continuous
   variables reported as medians (IQR) and categorical variables reported as
   N (%).
 </div>
 <br>
-<span style="font-size: 15px; font-weight: 800;">5. Metabolome Wide Association Study (MWAS) – Figures</span>
+<span style="font-size: 15px; font-weight: 800;">5. Metabolome Wide Association Study (MWAS): Figures</span>
 <div style="margin-left: 1.2em;">
   <u>Section 5.1</u> Displays MWAS results for a 4-PFAS mixture using volcano
   plots to visualize effect estimates and statistical evidence across cord
-  serum metabolites.
+  serum metabolites.**
 </div>
-<br>
 <div style="margin-left: 1.2em;">
   <u>Section 5.2</u> Displays MWAS results for each individual PFAS using volcano
   plots, enabling comparison of PFAS-specific signals with mixture-based
-  results.
+  results.**
 </div>
-<br>
 <div style="margin-left: 1.2em;">
   <u>Section 5.3</u> Displays sensitivity-analysis MWAS results for a 5-PFAS
   mixture using volcano plots to assess whether inclusion of MeFOSAA alters
-  overall patterns of association.
+  overall patterns of association.**
 </div>
-<br>
 <div style="margin-left: 1.2em;">
-  Volcano plots were originally developed by <strong>Elvira Fleury</strong> and edited by <strong>Amber Hampton</strong>.
+<br>
+  <em>**Note:</em> Volcano plots were originally developed by <strong>Elvira Fleury</strong> and later edited by <strong>Amber Hampton</strong>.
 </div>
 <br>
-<span style="font-size: 15px; font-weight: 800;">6. Pathway Enrichment Analysis (PEA) – Figures</span>
+<span style="font-size: 15px; font-weight: 800;">6. Pathway Enrichment Analysis (PEA): Figures</span>
 <div style="margin-left: 1.2em;">
   <u>Section 6.1</u> Displays pathway enrichment results for the 4-PFAS mixture
-  as well as individual PFAS using bubble plots summarizing pathway-level signals.
+  as well as individual PFAS using bubble plots summarizing pathway-level signals.***
 </div>
-<br>
 <div style="margin-left: 1.2em;">
   <u>Section 6.2</u> Displays sensitivity-analysis pathway enrichment results for
   a 5-PFAS mixture, enabling pathway-level comparison with the primary
-  4-PFAS mixture.
+  4-PFAS mixture.***
 </div>
-<br>
 <div style="margin-left: 1.2em;">
   <u>Section 6.3</u> Displays a pathway overlap Venn diagram comparing individual PFAS-specific pathway
-  signals.
+  signals.***
+</div>
+<div style="margin-left: 1.2em;">
+<br>
+  <em>***Note:</em> Bubbleplots and Venn diagram were originally developed by <strong>Elvira Fleury</strong> and later edited by <strong>Amber Hampton</strong>.
 </div>
 <br>
-<div style="margin-left: 1.2em;">
-  Bubble plot figures and Venn diagram were originally developed by <strong>Elvira Fleury</strong> and edited by <strong>Amber Hampton</strong>.
-</div>
-</div>
 
 <br>
 **Data Access.** The HOME Study data is restricted. See “Data Access & How to Run” for access details and how to run this project.
@@ -921,7 +921,7 @@ mummi_results_5pfas <- mummi_results_5pfas[mummi_results_5pfas$Gamma< 0.05, ]
 <br>
 
 <h1 style="text-align: center"> **Figures and Table Code** </h1>
-Below is the code I used to generate many of the figures and the descriptive table presented in my first-author, peer-reviewed publication <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515" target="_blank" rel="noopener noreferrer">(Hall et al.)</a>. This section is intended to serve both as a practical guide for people to understand, adapt, or extend these analyses. For ease of navigation, the code is organized into three main sections, corresponding to the major figure types and analytic stages of the study. These sections are detailed under 'Workflow & Deliverables'. 
+Below is the code I used to generate many of the figures and the descriptive table presented in my first-author, peer-reviewed publication <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515" target="_blank" rel="noopener noreferrer">(Hall et al.)</a>. This section is intended to serve both as a practical guide for people to understand, adapt, or extend these analyses. For ease of navigation, the code is organized into three main sections, corresponding to the major figure types and analytic stages of the study. These sections are detailed under 'Workflow & Deliverables' under the subheader "Figures and Table Code". 
 
 <h2 style="text-align: center"> **4. Exploratory Data Analysis** </h2>
 <h3 style="text-align: center"> 4.1. PFAS Correlation Heatmap </h3>
@@ -1079,7 +1079,7 @@ Table 1 summarizes maternal and household characteristics for participants inclu
 
 Continuous variables are presented as medians with interquartile ranges (IQR) to account for skewed distributions, while categorical variables are summarized using counts and percentages calculated among non-missing observations. Key characteristics include maternal age at delivery, race/ethnicity, gestational tobacco exposure (measured via cotinine concentrations at approximately 16 weeks’ gestation), household income, and parity.
 
-This table serves to contextualize the cohort prior to downstream metabolome-wide analyses. A thorough evaluation of covariate functional forms (including assessment of linearity and alternative parameterizations) was conducted separately and is described outside of this descriptive section.
+This table serves to contextualize the cohort prior to downstream metabolome-wide analyses. A thorough evaluation of covariate functional forms (including assessment of linearity and alternative parameterizations) was conducted separately and is briefly described in the methods section of my paper [(Hall et al.)](https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515).
 ```{r Covariate_Table, results='asis', echo=TRUE}
 # Note. This plot uses the non–log-transformed PFAS data that were previously imported for the correlation heatmap. The corresponding data import step is commented out below and provided for reference and reuse.
 
@@ -1168,7 +1168,7 @@ For visualization, a horizontal FDR significance threshold was drawn in red on e
 
 This was then transformed to the -log10 scale for visualization. Features exceeding this p<0.20 threshold (with BH correction) are highlighted in red to distinguish statistically prioritized metabolites from the background distribution.
 
-<h3 style="text-align: center"> 5.1. 4-PFAS mixture volcano plot </h3>
+<h3 style="text-align: center"> 5.1. 4-PFAS Mixture Volcano Plot </h3>
 
 For the 4-PFAS mixture, a volcano plot was created to display metabolome-wide association results for the joint effect of prenatal exposure to the four PFAS compounds. Each point represents a metabolomic feature, plotted by its estimated effect size (log2-fold change in ion intensity) on the x-axis and the strength of statistical evidence on the y-axis (-log10 scale)
 ```{r 4-PFAS-Volcano}
@@ -1206,12 +1206,12 @@ geom_point(data = subset(qg_comp_4_FULL, -log10(p.value) <= threshold), aes(x = 
 # Printing the plot
 print(pfas_mwas)
 ```
-<h3 style="text-align: center"> 5.2. Single-PFAS volcano plots </h3>
+<h3 style="text-align: center"> 5.2. Single-PFAS Volcano Plots </h3>
 To examine compound-specific associations, volcano plots were generated separately for each of the four individual PFAS included in the mixture. Each plot displays metabolomic features by estimated effect size and statistical significance, allowing direct comparison of association patterns across compounds.
 
 The individual volcano plots were created using a consistent modeling and visualization framework and then combined into a single figure using the ggpubr package to facilitate side-by-side comparison. The code for each individual plot and its corresponding output are shown below.
 
-<h4 style="text-align: center"> 5.2.1 Single-PFAS volcano plots:PFOA (Plot 1 of 4)</h4>
+<h4 style="text-align: center"> 5.2.1 Single-PFAS Volcano Plots:PFOA (Plot 1 of 4)</h4>
 ```{r Single-PFAS-Volcano-PFOA}
 # Calculating the number of significant values for the PFOA MWAS
 n_sig_PFOA = nrow(PFOA_SIG)
@@ -1255,7 +1255,7 @@ pfoa_mwas_plot <- ggplot() +
     plot.title = element_text(size = 11))
 ```
 
-<h4 style="text-align: center"> 5.2.2 Single-PFAS volcano plots:PFNA (Plot 2 of 4)</h4>
+<h4 style="text-align: center"> 5.2.2 Single-PFAS Volcano Plots:PFNA (Plot 2 of 4)</h4>
 ```{r Single-PFAS-Volcano-PFNA}
 # Calculating the number of significant values for the PFNA MWAS
 n_sig_PFNA = nrow(PFNA_SIG)
@@ -1299,7 +1299,7 @@ pfna_mwas_plot <- ggplot() +
     plot.title = element_text(size = 11))
 ```
 
-<h4 style="text-align: center"> 5.2.3 Single-PFAS volcano plots:PFHxS (Plot 3 of 4)</h4>
+<h4 style="text-align: center"> 5.2.3 Single-PFAS Volcano Plots:PFHxS (Plot 3 of 4)</h4>
 ```{r Single-PFAS-Volcano-PFHxS}
 # Calculating the number of significant values for the PFNA MWAS
 n_sig_PFHxS = nrow(PFHxS_SIG)
@@ -1343,7 +1343,7 @@ pfhxs_mwas_plot <- ggplot() +
     plot.title = element_text(size = 11))
 ```
 
-<h4 style="text-align: center"> 5.2.4 Single-PFAS volcano plots:PFOS (Plot 4 of 4)</h4>
+<h4 style="text-align: center"> 5.2.4 Single-PFAS Volcano Plots:PFOS (Plot 4 of 4)</h4>
 ```{r Single-PFAS-Volcano-PFOS}
 # Calculating the number of significant values for the PFOS MWAS
 n_sig_PFOS = nrow(PFOS_SIG)
@@ -1406,9 +1406,9 @@ individ_mwas <- ggpubr::annotate_figure(
 print(individ_mwas)
 ```
 
-<h3 style="text-align: center"> 5.3. Sensitivity Analysis Volcano Plot (5-PFAS mixture) </h3>
+<h3 style="text-align: center"> 5.3. Sensitivity Analysis Volcano Plot (5-PFAS Mixture) </h3>
 
-As a sensitivity analysis, I generated a volcano plot for a 5-PFAS mixture that included MeFOSAA (PFOS, PFOA, PFNA, PFHxS, and MeFOSAA). This figure mirrors the primary MWAS volcano plot and is used to assess whether adding MeFOSAA changes the overall pattern of effect sizes and statistically prioritized metabolomic features.
+As a sensitivity analysis, I generated a volcano plot for a 5-PFAS mixture that included MeFOSAA in addition to the original 4-PFAS mixture (PFOS, PFOA, PFNA, and PFHxS). This figure mirrors the primary MWAS volcano plot and is used to assess whether inclusion of MeFOSAA alters the overall pattern of effect sizes or the set of statistically prioritized metabolomic features.
 ```{r 5-PFAS-Volcano}
 # Calculating the number of significant values for the 4-PFAS mixture
 n_sig_5 = nrow(qg_comp_5_SIG)
@@ -1457,11 +1457,11 @@ print(mefosaa_mwas)
 
 <h2 style="text-align: center"> **6. Pathway Enrichment Analysis-Figures** </h2>
 
-In the next section, I provide the code used to generate the bubble plots. This code was adapted from **Elvira Fleury** and extended to incorporate KEGG BRITE pathways and to overlay individual PFAS results alongside the 4-PFAS mixture.
+In this section, I provide the code used to generate the bubble plots. This code was adapted from **Elvira Fleury's original code** and extended to incorporate KEGG BRITE pathways and to overlay individual PFAS results alongside the 4-PFAS mixture with other minor modifications.
 
 Bubble plots were used to summarize pathway-level results because they simultaneously convey statistical significance and enrichment strength across many pathways. In these figures, the x-axis reflects statistical evidence, point size represents enrichment magnitude, and color distinguishes exposure models, allowing efficient comparison of pathway patterns across mixtures and individual PFAS.
 
-<h3 style="text-align: center"> 6.1. Bubble plot (4-PFAS mixture & single PFAS) </h3>
+<h3 style="text-align: center"> 6.1. Bubble Plot (4-PFAS Mixture & Single PFAS) </h3>
 This bubble plot summarizes metabolic pathways enriched in association with the 4-PFAS mixture (PFOS, PFOA, PFNA, PFHxS) based on mummichog pathway enrichment analysis. Each point represents a metabolic pathway, with horizontal position reflecting statistical evidence and point size indicating enrichment strength.
 
 Pathways were ordered by statistical significance for the 4-PFAS mixture and grouped according to superpathways defined in the KEGG BRITE database [(KEGG BRITE Database)](https://www.genome.jp/kegg/brite.html). Superpathway brackets were added manually as a presentation layer to improve readability; all pathway ordering and enrichment statistics are unchanged.
@@ -1556,20 +1556,22 @@ geom_point(data = pfoa_for_plot, aes(x = -log10(Gamma), y = X1, size = Hits.sig 
         legend.text = element_text(size = 14),
         legend.box = "vertical")
 ```
-
-After this, the figure will look like this:
+<br> 
+<br>
+After running this code, the resulting figure will appear as shown below.
+<br>
 ```{r Individual_BubblePlot_4_PFAS_Render, warning=FALSE, message=FALSE, fig.width=12, fig.height=15, dpi=200, out.widtheval=TRUE, echo=FALSE}
 print(four_ind_mummi)
 ```
 
 An important note, for plots with many or long pathway labels, adjusting figure dimensions (particularly height) may be necessary for readability. This can be done either by specifying dimensions in Quarto or when exporting the plot (e.g., with ggsave()). 
 
-After generating the base bubble plot, I added the KEGG BRITE Superpathway brackets manually as a post-processing annotation. This was my final result:
+After generating the base bubble plot, KEGG BRITE superpathway brackets were added manually as a post-processing annotation. The final figure is shown below.
 ```{r Individual_BubblePlot_Final, echo=FALSE, fig.align="center"}
 knitr::include_graphics("Figures/4-PFAS Mixture Bubbleplot.png")
 ```
 
-<h3 style="text-align: center"> 6.2. Sensitivity Analysis bubble plot </h3>
+<h3 style="text-align: center"> 6.2. Sensitivity Analysis Bubble Plot </h3>
 As a sensitivity analysis, this bubble plot summarizes pathway enrichment results for a 5-PFAS mixture that includes MeFOSAA. Using the same analytic steps as the primary mixture and individual-PFAS pathway analyses, the figure compares these results with those from the 4-PFAS mixture to evaluate whether the biological pathways implicated by prenatal PFAS exposure remain consistent when MeFOSAA is included, providing a pathway-level assessment of robustness to mixture specification.
 ```{r 5PFAS_BubblePlot, warning=FALSE, message=FALSE, fig.width=10, fig.height=15, dpi=200}
 theme_set(theme_bw(base_size = 12, base_family = "Times New Roman"))
@@ -1615,7 +1617,7 @@ geom_point(data = mummi_for_plot_5, aes(x = -log10(Gamma), y = X1, size = Hits.s
 knitr::include_graphics("Figures/5-PFAS Mixture Bubbleplot.png")
 ```
 
-<h3 style="text-align: center"> 6.3. Pathway overlap Venn diagram </h3>
+<h3 style="text-align: center"> 6.3. Pathway Overlap Venn Diagram </h3>
 To compare pathway signals across individual PFAS, I created a Venn diagram summarizing overlap in significantly enriched pathways (p(Gamma) < 0.05) for PFOA, PFNA, PFHxS, and PFOS. This visualization highlights which pathways are shared across PFAS versus those that appear more compound-specific, providing a quick summary of consistency in pathway enrichment patterns across the individual exposure models.
 ```{r venn_plot, warning=FALSE, message=FALSE, fig.width=12, fig.height=9, dpi=300}
 # Creating list of PFAS to include for the Venn diagram 
@@ -1645,6 +1647,7 @@ print(venn)
 <br><br>
 <h1 style="text-align: center;">**Acknowledgments**</h1>
 I would like to thank my coauthors: Elvira Fleury, Katherine E. Manz, George D. Papandonatos, Jessie P. Buckley, Kim M. Cecil, Aimin Chen, Bruce P. Lanphear, Kimberly Yolton, Douglas I. Walker, Kurt D. Pennell, and Joseph M. Braunfor their contributions to the publication of this research.
+<br>
 <br>
 I would specifically like to acknowledge **Elvira Fleury**, who contributed code for selected figures and collaborated with me on portions of the MWAS and MetaboAnalystR/mummichog pathway enrichment analysis (PEA) workflow.
 
