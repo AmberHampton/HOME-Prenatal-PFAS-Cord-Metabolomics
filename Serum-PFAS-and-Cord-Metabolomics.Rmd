@@ -9,13 +9,27 @@ output:
     toc_float:
       collapsed: false
       smooth_scroll: true
-    css: style_met.css
+    css: /Users/amber/Desktop/Metabolomics/Github/style_met.css
 ---
 
 ```{r setup, include=FALSE}
-#Setting the working directory for my local machine (data are restricted; paths must be updated to run)
-library(knitr) 
-knitr::opts_knit$set(root.dir = '/Users/amber/Desktop/Metabolomics/Github', tidy=TRUE)
+# Setting up the paths(local and  Docker)
+library(knitr)
+
+# Coding the repo root (inside Docker we'll mount this to /project)
+project_root <- if (dir.exists("/project")) "/project" else "/Users/amber/Desktop/Metabolomics/Github"
+
+# Restricting the data root (inside Docker we'll mount this to /data)
+data_root <- if (dir.exists("/data")) "/data" else "/Users/amber/Desktop/Metabolomics/Data"
+
+# Coding the analysis root 
+analyses_root <- if (dir.exists("/analyses")) "/analyses" else "/Users/amber/Desktop/Metabolomics/Analyses"
+
+# Telling knitr where the project lives (figures/css/etc.)
+knitr::opts_knit$set(root.dir = project_root, tidy = TRUE)
+
+# Specifying the analysis pathway
+analyses_data_dir <- file.path(analyses_root, "Data")
 ```
 <h1 style="text-align: center"> **Overview** </h1>
 <br>
@@ -248,8 +262,7 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
 <br>
   <em>***Note:</em> Bubbleplots and Venn diagram were originally developed by <strong>Elvira Fleury</strong> and later edited by <strong>Amber Hampton</strong>.
 </div>
-<br>
-
+</div>
 <br>
 **Data Access.** The HOME Study data is restricted. See “Data Access & How to Run” for access details and how to run this project.
 <br>
@@ -339,17 +352,20 @@ For the map files, the headers are detailed in the box below.
 Next, I imported the feature data and map files using the code chunk below. 
 <br>
 ```{r Import_Feature}
+# Folder containing your restricted CSVs
+data_dir <- file.path(data_root)
+
 # Importing the C18 map file that identifies the IDs
-C18_map <- read.csv("Data/C18_map_clean.csv", header = TRUE) # INSERT YOUR FILE PATHWAY HERE
+C18_map <- read.csv(file.path(data_dir, "C18_map_clean.csv"), header = TRUE)
 
 # Importing the HILIC map file that identifies the IDs
-HILIC_map <- read.csv("Data/HILIC_map_clean.csv", header = TRUE) # INSERT YOUR FILE PATHWAY HERE
+HILIC_map <- read.csv(file.path(data_dir, "HILIC_map_clean.csv"), header = TRUE)
 
 # Importing the batch-corrected C18 data
-C18 <- read.csv ('Data/C18_clean.csv', header = TRUE) # INSERT YOUR FILE PATHWAY HERE
+C18 <- read.csv(file.path(data_dir, "C18_clean.csv"), header = TRUE)
 
 # Importing the batch-corrected HILIC data
-HILIC <- read.csv ('Data/HILIC_clean.csv', header = TRUE) # INSERT YOUR FILE PATHWAY HERE
+HILIC <- read.csv(file.path(data_dir, "HILIC_clean.csv"), header = TRUE)
 ```
 
 I then imported the PFAS data. This dataset was named *pfas_only*.
@@ -371,8 +387,8 @@ The headers for *pfas_only* are in the box below.
 
 ```{r Import_PFAS}
 # Importing the PFAS file
-pfas_only <- read.csv("Data/pfas_clean.csv", header = TRUE)   %>% # INSERT YOUR FILE PATHWAY HERE 
-    mutate(participant_ID = as.character(participant_ID)) #Converting this to a character variable
+pfas_only <- read.csv(file.path(data_dir, "pfas_clean.csv"), header = TRUE) %>%
+  mutate(participant_ID = as.character(participant_ID)) #Converting this to a character variable
 ```
 
 After importing the feature and PFAS data, I imported the covariate data. This dataset was named *cov*.
@@ -393,7 +409,7 @@ For *cov*, the headers are as follows:
 
 ```{r Import_Covariate}
 # Importing covariate data
-cov <- read.csv("Data/covariates_clean.csv", header = TRUE) # INSERT YOUR FILE PATHWAY HERE
+cov <- read.csv(file.path(data_dir, "covariates_clean.csv"), header = TRUE)
 ```
 
 <h3 style="text-align: center"> 1.3. Creating a Master Dataset</h3>
@@ -785,7 +801,9 @@ mSet4 <- SetPeakFormat(mSet4, "rmp")
 mSet4 <- UpdateInstrumentParameters(mSet4, 5.0, "mixed", "no"); 
 
 # Reading in the specific peak list
-mSet4 <- Read.PeakListData(mSet4, "Final Datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS.csv"); # INSERT YOUR PATHWAY HERE
+peak_file_4 <- if (dir.exists("/final_datasets")) "/final_datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS.csv" else "/Users/amber/Desktop/Metabolomics/Final Datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS.csv"
+mSet4 <- MetaboAnalystR::Read.PeakListData(mSet4, peak_file_4)
+
 
 # Performing a sanity check to ensure the data is in a suitable format for further analysis
 mSet4 <- SanityCheckMummichogData(mSet4)
@@ -829,37 +847,63 @@ Details regarding the untargeted analysis are described in detail in my first au
 
 ```{r PEA_Individual_PFAS, message=FALSE, warning=FALSE, results='hide'}
 # Creating a list of the PFAS we are evaluating
-PFAS <- c("PFOA", "PFOS", "PFHxS", "PFNA", "MEFOSAA")
+PFAS_vec <- c("PFOA", "PFOS", "PFHxS", "PFNA", "MEFOSAA")
 
 # Creating an empty list to store the results for each PFAS
 results_list <- list()
 
 # Creating a loop to loop through each PFAS and output the results
-for (PFAS in PFAS) {
+for (pfas in PFAS_vec) {
+
   # Creating an object for storing data for mummichog
   mSet <- InitDataObjects("mass_all", "mummichog", FALSE, default.dpi = 72)
+
   # Ranking the peaks by their p-value
   mSet <- SetPeakFormat(mSet, "rmp")
+
   # Specifying instrument parameters
   mSet <- UpdateInstrumentParameters(mSet, 5.0, "mixed", "no")
+
   # Reading in the specific peak list
-  file_path <- paste("Final Datasets/Metaboanalyst/Individual PFAS/", PFAS, "_METABOANALYST.csv", sep = "")
-  mSet <- Read.PeakListData(mSet, file_path)
+  metabo_dir <- if (dir.exists("/final_datasets")) {
+    "/final_datasets/Metaboanalyst/Individual PFAS"
+  } else {
+    "/Users/amber/Desktop/Metabolomics/Final Datasets/Metaboanalyst/Individual PFAS"
+  }
+
+  file_path <- file.path(metabo_dir, paste0(pfas, "_METABOANALYST.csv"))
+
+  # (Fix for spaces in file paths) Copy to a temp file without spaces, then read
+  tmp_path <- file.path(tempdir(), paste0(pfas, "_METABOANALYST.csv"))
+  stopifnot(file.exists(file_path))
+  file.copy(file_path, tmp_path, overwrite = TRUE)
+
+  mSet <- Read.PeakListData(mSet, tmp_path)
+
   # Performing a sanity check
   mSet <- SanityCheckMummichogData(mSet)
+
   # Adding in the adduct data
   mSet <- Setup.AdductData(mSet, add.vec)
+
   # Specifying both positive and negative adducts
   mSet <- PerformAdductMapping(mSet, "mixed")
+
   # Running the mummichog algorithm using selected adducts and version 2 of the mummichog algorithm
   mSet <- SetPeakEnrichMethod(mSet, "mum", "v2")
-  mSet <- SetMummichogPval(mSet, 0.05) # Specifying a p-value of 0.05
-  # Selecting the human MFN network, selecting the current human MFN library, restricting to metabolite datasets with at least 3 entries, and running 10,000 permutations
+
+  # Specifying a p-value of 0.05
+  mSet <- SetMummichogPval(mSet, 0.05)
+
+  # Selecting the human MFN network, selecting the current human MFN library,
+  # restricting to metabolite datasets with at least 3 entries, and running 10,000 permutations
   mSet <- PerformPSEA(mSet, "hsa_mfn", "current", 3, 10000)
+
   # Storing the results as a dataframe
-  results_list[[PFAS]] <- as.data.frame(mSet$mummi.resmat)
+  results_list[[pfas]] <- as.data.frame(mSet$mummi.resmat)
+
   # Restricting the results to those with a p(gamma) < 0.05
-  results_list[[PFAS]] <- results_list[[PFAS]][results_list[[PFAS]]$Gamma < 0.05, ]
+  results_list[[pfas]] <- results_list[[pfas]][results_list[[pfas]]$Gamma < 0.05, ]
 }
 ```
 
@@ -893,7 +937,9 @@ mSet5<- SetPeakFormat(mSet5, "rmp")
 mSet5<-UpdateInstrumentParameters(mSet5, 5.0, "mixed", "no"); 
 
 # Reading in the specific peak list
-mSet5<-Read.PeakListData(mSet5, "Final Datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS_and_ME_PFOSA.csv"); # INSERT YOUR PATHWAY HERE
+# Reading in the specific peak list
+mSet5 <- Read.PeakListData(mSet5, if (dir.exists("/final_datasets")) {"/final_datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS_and_ME_PFOSA.csv"} 
+                           else {"/Users/amber/Desktop/Metabolomics/Final Datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS_and_ME_PFOSA.csv"})
 
 # Performing a sanity check to ensure the data is in a suitable format for further analysis
 mSet5<-SanityCheckMummichogData(mSet5)
@@ -933,7 +979,7 @@ Spearman correlations were chosen because the non-transformed PFAS distributions
 To generate this figure, I imported the non-transformed PFAS dataset, selected the relevant exposure variables, and computed pairwise Spearman correlation coefficients, which were then visualized as a heatmap.
 ```{r Heatmap1}
 # Importing the file containing the non-transformed pfas data
-full_cov_pfas <- read.csv("Data/pfas_not_transformed.csv") # INSERT YOUR DATA HERE
+full_cov_pfas <- read.csv(file.path(data_dir, "pfas_not_transformed.csv"))
 
 # Selecting specific columns
 cor_cols <- dplyr::select(full_cov_pfas, PFOA, PFNA, PFHxS, PFOS, MeFOSAA)
@@ -996,7 +1042,7 @@ To summarize the distributions of prenatal PFAS concentrations, I used violin pl
 # Note. This plot uses the non–log-transformed PFAS data that were previously imported for the correlation heatmap. The corresponding data import step is commented out below and provided for reference and reuse.
 
 # Importing the file containing the non-transformed pfas data
-#full_cov_pfas <- read.csv("Data/pfas_not_transformed.csv") # INSERT YOUR DATA HERE
+#full_cov_pfas <- read.csv(file.path(data_dir, "pfas_not_transformed.csv"))
 
 # Assigning colors to each PFAS
 pfas_colors <- c(
@@ -1084,7 +1130,7 @@ This table serves to contextualize the cohort prior to downstream metabolome-wid
 # Note. This plot uses the non–log-transformed PFAS data that were previously imported for the correlation heatmap. The corresponding data import step is commented out below and provided for reference and reuse.
 
 # Importing the file containing the non-transformed pfas data
-#full_cov_pfas <- read.csv("Data/pfas_not_transformed.csv") # INSERT YOUR DATA HERE
+#full_cov_pfas <- read.csv(file.path(data_dir, "pfas_not_transformed.csv"))
 
 # Creating the sample size used for Table 1
 N <- nrow(full_cov_pfas)
@@ -1475,7 +1521,7 @@ add_levels <- function(x, levels) {
 }
 
 # Importing the data I need for the 4-PFAS Mixture mixture and locking in the order for pathways
-mummi_for_plot <- mummi_for_plot<-read.csv("/Users/amber/Desktop/Metabolomics/Analyses/Data/2023.06.04.mummi_4pfas_res.csv") 
+mummi_for_plot <- read.csv(file.path(analyses_data_dir, "2023.06.04.mummi_4pfas_res.csv"))
 mummi_for_plot$X1 <- add_levels(mummi_for_plot$X1, mummi_for_plot$Pathway)
 
 # Creating a new 'skeleton copy' of the 4-PFAS dataset
@@ -1483,8 +1529,8 @@ blank <- mummi_for_plot
 blank[, -(1:3)] <- NA
 
 
-# Importing the full individual-PFAS mummichog results, then aligning them to the mixture pathway set so all plots share the same pathway universe and y-axis ordering (Pathway -> X1 mapping).
-mummi_for_plot_ind <- read.csv("/Users/amber/Desktop/Metabolomics/Analyses/Data/individual.csv")
+# Importing the full individual-PFAS mummichog results, then aligning them to the mixture pathway set so all plots share the same pathway universe and y-axis analyses_data_dir <- file.path(analyses_root, "Data")
+mummi_for_plot_ind <- read.csv(file.path(analyses_data_dir, "individual.csv"))
 
 # Keeping only the pathways that also appear in the mixture results (so comparisons are apples-to-apples)
 mummi_for_plot_ind <- subset(mummi_for_plot_ind, Pathway %in% mummi_for_plot$Pathway)
@@ -1578,9 +1624,10 @@ theme_set(theme_bw(base_size = 12, base_family = "Times New Roman"))
 
 # Loading in the mixture data
 # 5-PFAS Mixture
-mummi_for_plot_5 <- read.csv("/Users/amber/Desktop/Metabolomics/Analyses/Data/2023.07.19.mummi_5PFAS with 4-PFAS pathways too.csv") 
+mummi_for_plot_5 <- read.csv(file.path(analyses_data_dir,"2023.07.19.mummi_5PFAS with 4-PFAS pathways too.csv"))
+
 # 4-PFAS Mixture
-mummi_for_plot_4 <- read.csv("/Users/amber/Desktop/Metabolomics/Analyses/Data/2023.07.19.mummi_4PFAS with 5-PFAS pathways too.csv") 
+mummi_for_plot_4 <- read.csv(file.path(analyses_data_dir,"2023.07.19.mummi_4PFAS with 5-PFAS pathways too.csv"))
 
 # 5-PFAS Mixture bubble plot 
 

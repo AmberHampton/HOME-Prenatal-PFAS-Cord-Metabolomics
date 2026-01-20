@@ -1,0 +1,24 @@
+/* 1) Making the TOC column wider so long items don't wrap */
+@media (min-width: 768px) {
+  div.tocify {
+    width: 330px;        
+    max-width: 330px;
+  }
+
+  /* 2) Moving the main content to the right so it doesn't overlap */
+  div.tocify + .toc-content {
+    margin-left: 330px;
+  }
+}
+
+/* 3) Tightening TOC typography so it doesn't look “double-spaced” */
+div.tocify, div.tocify ul, div.tocify li {
+  font-size: 12px;      
+  line-height: 1;
+}
+
+/* 4) Reducing padding between items */
+div.tocify ul li {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}

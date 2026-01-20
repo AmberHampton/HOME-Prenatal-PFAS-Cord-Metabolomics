@@ -1,0 +1,10 @@
+.git/
+.Rhistory
+.RData
+.DS_Store
+outputs/
+*.html
+Data/
+Final Datasets/
+
+

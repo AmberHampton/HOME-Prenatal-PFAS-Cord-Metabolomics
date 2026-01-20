@@ -1,0 +1,19 @@
+# Git + OS junk
+.git/
+.DS_Store
+
+# R / RStudio
+.Rhistory
+.RData
+.Rproj.user/
+renv/library/
+
+# Outputs (generated)
+outputs/
+*.html
+*.pdf
+
+# Safety: ignore these if they exist inside the repo
+Data/
+Final Datasets/
+
