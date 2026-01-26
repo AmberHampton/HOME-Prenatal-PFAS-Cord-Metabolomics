@@ -27,6 +27,16 @@ analyses_root = if (dir.exists("/analyses")) "/analyses" else "/Users/amber/Desk
 # Final Datasets root (inside Docker we'll mount this to /final_datasets)
 final_root = if (dir.exists("/final_datasets")) "/final_datasets" else "/Users/amber/Desktop/Metabolomics/Final Datasets"
 
+# Ensuring figures exists (relative to knitr root.dir)
+fig_dir <- file.path(project_root, "Figures")
+dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
+
+knitr::opts_chunk$set(
+  fig.path   = "Figures/",
+  fig.ext    = "png",
+  dpi        = 300,
+  fig.retina = 2)
+
 # Telling knitr where the project lives (figures/css/etc.)
 knitr::opts_knit$set(root.dir = project_root, tidy = TRUE)
 
