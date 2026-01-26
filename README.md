@@ -9,13 +9,13 @@ Hall, Amber M., et al. “Associations of a Prenatal Serum Per- and Polyfluoroal
 
 ## Project snapshot
 
-This repository demonstrates an end-to-end, publication-backed workflow for a high-dimensional omics association study:
+This repository demonstrates an end-to-end workflow for a high-dimensional omics association study:
 
 - **Problem:** Identify cord-serum metabolomic features and biological pathways associated with **prenatal PFAS exposure**.
 - **Scale:** ~**14,402** metabolomic features; **264** mother–infant dyads.
-- **Modeling:** Mixture modeling via **quantile-based g-computation (qgcomp)** + single-pollutant regressions.
+- **Modeling:** Mixture modeling via **quantile-based g-computation (qgcomp)** + single-pollutant modeling via **linear regression**.
 - **Interpretation:** Pathway enrichment via **mummichog / MetaboAnalystR**.
-- **Reproducibility:** Modular code, consistent outputs to CSV, and Docker-compatible paths.
+- **Reproducibility:** Modular R code, consistent outputs to CSV, and Docker-compatible paths.
 
 If you only click one thing: **open the rendered HTML workflow** (link below).
 
