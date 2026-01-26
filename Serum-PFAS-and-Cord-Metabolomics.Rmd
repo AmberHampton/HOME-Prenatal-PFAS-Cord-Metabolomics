@@ -1,7 +1,6 @@
 ---
 title: "PFAS and the Metabolome"
 author: "Amber M Hampton, PhD"
-date: "2023-08-18"
 output:
   html_document:
     toc: true
@@ -9,7 +8,7 @@ output:
     toc_float:
       collapsed: false
       smooth_scroll: true
-    css: /Users/amber/Desktop/Metabolomics/Github/style_met.css
+    css: style_met.css
 ---
 
 ```{r setup, include=FALSE}
@@ -17,19 +16,22 @@ output:
 library(knitr)
 
 # Coding the repo root (inside Docker we'll mount this to /project)
-project_root <- if (dir.exists("/project")) "/project" else "/Users/amber/Desktop/Metabolomics/Github"
+project_root = if (dir.exists("/project")) "/project" else "/Users/amber/Desktop/Metabolomics/Github"
 
 # Restricting the data root (inside Docker we'll mount this to /data)
-data_root <- if (dir.exists("/data")) "/data" else "/Users/amber/Desktop/Metabolomics/Data"
+data_root = if (dir.exists("/data")) "/data" else "/Users/amber/Desktop/Metabolomics/Data"
 
 # Coding the analysis root 
-analyses_root <- if (dir.exists("/analyses")) "/analyses" else "/Users/amber/Desktop/Metabolomics/Analyses"
+analyses_root = if (dir.exists("/analyses")) "/analyses" else "/Users/amber/Desktop/Metabolomics/Analyses"
+
+# Final Datasets root (inside Docker we'll mount this to /final_datasets)
+final_root = if (dir.exists("/final_datasets")) "/final_datasets" else "/Users/amber/Desktop/Metabolomics/Final Datasets"
 
 # Telling knitr where the project lives (figures/css/etc.)
 knitr::opts_knit$set(root.dir = project_root, tidy = TRUE)
 
 # Specifying the analysis pathway
-analyses_data_dir <- file.path(analyses_root, "Data")
+analyses_data_dir = file.path(analyses_root, "Data")
 ```
 <h1 style="text-align: center"> **Overview** </h1>
 <br>
@@ -54,7 +56,7 @@ Per- and polyfluoroalkyl substances (PFAS) are widespread, persistent synthetic 
 <li>*4-PFAS Mixture (primary)*: Adjusted quantile-based g-computation to estimate the joint effect of the 4-PFAS mixture on each metabolomic feature.
 </li>
 
-<li>*Single-pollutant MWAS (secondary)*: Covariate-adjusted linear models for each PFAS individually to contextualize mixture results and identify PFAS-specific signals.
+<li>*Single-pollutant MWAS (secondary)*: Covariate-adjusted linear regression models for each PFAS individually to contextualize mixture results and identify PFAS-specific signals.
 </li></ul>
 
 <br><u>*mummichog* Pathway Enrichment Analysis (PEA):</u> The primary MWAS outputs were used in a *mummichog* PEA to identify biological pathways most consistently implicated by PFAS exposure.
@@ -80,6 +82,7 @@ These results point to plausible biological mechanisms linking prenatal PFAS exp
 <br>*Covariates adjustments:* maternal age, race/ethnicity, parity, household income, and cotinine concentrations (smoking).
 <br><br>**Implementation**<br> Analyses were implemented in R using modular scripts/functions to support reproducibility and consistent analysis across thousands of features. Key outputs include MWAS and pathway-enrichment visualizations, plus sensitivity analyses evaluating robustness to mixture specification.
 <br><br>**Reproducibility**<br> HOME Study data is restricted; this project emphasizes transparent, modular analysis code and reproducible figure generation.
+<br><br>**Deliverables**<br> Analysis outputs are saved as CSV files, and all figures are fully reproducible via R Markdown. Docker-compatible paths are supported.
 <br>
 <br>
 
@@ -88,7 +91,7 @@ These results point to plausible biological mechanisms linking prenatal PFAS exp
 <span style="font-size: 15px; font-weight: 800;">Data Access Note.</span>
 The data for this study is from the Health Outcomes and Measures of the Environment (HOME) Study [(Braun et al.)](https://pubmed.ncbi.nlm.nih.gov/27006352/). This data is not publicly available. However, the HOME Study principal investigators are actively engaged in collaborative data-sharing projects and welcome new collaborations. Interested investigators can request data access here [(HOME Study Data Request)](https://homestudy.research.cchmc.org/contact). The HOME Study Data Sharing Committee meets regularly to review proposed research projects, ensure that they do not overlap with existing projects, and ensure efficient use of limited resources (e.g., cord blood). <br>
 
-<span style="font-size: 15px; font-weight: 800;">How to Run the Figures and Table</span>
+<span style="font-size: 15px; font-weight: 800;">How to Run the Anaysis Code</span>
 <ol>
   <li>
     Open the <code>.Rmd</code> and set your local paths so the project can find the analysis-ready inputs.
@@ -108,13 +111,12 @@ The data for this study is from the Health Outcomes and Measures of the Environm
     Pathway enrichment outputs (*mummichog* results) are saved as <code>.csv</code> files for mixture, single-PFAS, and sensitivity analyses.
   </li>
 </ol>
-
 <span style="font-size: 15px; font-weight: 800;">How to Run the Figures and Table</span>
 <ol>
   <li>
     Open the <code>.Rmd</code> and set your local paths so the project can find the analysis-ready inputs.
   </li>
-  <li> Exploratory Data Analysis (EDA) figures and the summary table can be generated independently and do not require any upstream computations. All other figures are downstream artifacts and depend on the successful completion of their corresponding analyses. For example, Metabolome-Wide Association Study (MWAS) analyses must be run prior to generating MWAS figures, and Pathway Enrichment Analysis outputs must be produced before creating their associated visualizations.
+  <li> Exploratory Data Analysis (EDA) figures and the summary table (Section 4. Exploratory Data Analysis) can be generated independently and do not require any upstream computations. All other figures are downstream artifacts and depend on the successful completion of their corresponding analyses. For example, Metabolome-Wide Association Study (MWAS) analyses must be run prior to generating MWAS figures, and Pathway Enrichment Analysis outputs must be produced before creating their associated visualizations.
   </li>
   <li>
     Tables and figures are generated directly within the notebook and rendered on knit. If users wish to save outputs to disk, standard R export functions (e.g., ggsave() for figures or write.csv() for tables) can be used to write results to a desired directory such as <b>Final Datasets/</b>.
@@ -133,7 +135,7 @@ This workflow can be adapted to other metabolomics MWAS settings by updating:
 <h2 style="text-align: center"><b>Repository Overview</b></h2>
 
 <div class="repo-overview"><p>
-This repository provides a reproducible, end-to-end workflow for conducting a metabolome-wide association study (MWAS) of prenatal PFAS exposures and interpreting feature-level results using <em>mummichog</em> pathway enrichment. It supports my first-author, peer-reviewed publication <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515" target="_blank" rel="noopener noreferrer">(Hall et al.)</a> and is designed as an instructional resource for researchers replicating MWAS + <em>mummichog</em> pipelines.
+This repository provides a reproducible, end-to-end workflow for conducting a metabolome-wide association study (MWAS) of prenatal PFAS exposures and interpreting feature-level results using <em>mummichog</em> pathway enrichment. It supports my first-author paper <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515" target="_blank" rel="noopener noreferrer">(Hall et al.)</a> and is designed as an instructional resource for researchers replicating MWAS + <em>mummichog</em> pipelines.
 </p>
 
 <p>This workflow begins from <strong>analysis-ready inputs</strong> (i.e., after upstream LC&ndash;HRMS processing and study-specific QC). Upstream processing steps are summarized in Figure 1 below for transparency but are not re-run here.
@@ -151,11 +153,11 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
 <h2 style="text-align: center"><b>Workflow & Deliverables</b></h2>
 <div style="border: 1px solid #000; padding: 10px; background-color: #FDECEF">
 <h3 style="font-weight: 800;">Analysis Code</h3>
-<span style="font-size: 15px; font-weight: 800;">1. Data Import & Cleaning</span>
+<span style="font-size: 15px; font-weight: 800;">1. Data Import</span>
 <div style="margin-left: 1.2em;">
-  Cleans and structures data for analyses.
-</div>
+Structures data for analyses. HOME-specific cleaning/structuring is omitted to keep the workflow general and easy to repurpose.
 <br>
+</div>
 <span style="font-size: 15px; font-weight: 800;">2. Metabolome Wide Association Study (MWAS)</span>
 <div style="margin-left: 1.2em;">
   <u>Section 2.1</u> Conducts an MWAS using quantile-based g-computation
@@ -175,13 +177,6 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
   and each metabolite. This serves as a sensitivity analysis to assess the
   impact of MeFOSAA on the primary findings.*
 </div>
-<div style="margin-left: 1.2em;">
-<br>
-  <em>*Note:</em> These analyses use the Benjamini–Hochberg false discovery rate
-  (BH FDR). An FDR &lt; 0.20 was used as an exploratory threshold to retain a
-  broader set of candidate metabolic features for follow-up investigation.
-</div>
-<br>
 <span style="font-size: 15px; font-weight: 800;">3. Pathway Enrichment Analysis (PEA)</span>
 <div style="margin-left: 1.2em;">
   <u>Section 3.2</u> Performs a PEA using <em>mummichog</em> via MetaboAnalyst 3.2
@@ -200,8 +195,8 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
   for a 5-PFAS mixture. Input data were generated during the 5-PFAS MWAS
   (Section 2.3) as a sensitivity analysis to assess robustness to mixture
   specification.
+  <br>
 </div>
-<br>
 <h3 style="font-weight: 800;">Figures and Table Code</h3>
 <span style="font-size: 15px; font-weight: 800;">4. Exploratory Data Analysis</span>
 <div style="margin-left: 1.2em;">
@@ -221,8 +216,8 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
   household characteristics in the HOME Study (2003–2006), with continuous
   variables reported as medians (IQR) and categorical variables reported as
   N (%).
-</div>
 <br>
+</div>
 <span style="font-size: 15px; font-weight: 800;">5. Metabolome Wide Association Study (MWAS): Figures</span>
 <div style="margin-left: 1.2em;">
   <u>Section 5.1</u> Displays MWAS results for a 4-PFAS mixture using volcano
@@ -238,29 +233,31 @@ knitr::include_graphics("Figures/workflow_end_to_end.png")
   <u>Section 5.3</u> Displays sensitivity-analysis MWAS results for a 5-PFAS
   mixture using volcano plots to assess whether inclusion of MeFOSAA alters
   overall patterns of association.**
-</div>
-<div style="margin-left: 1.2em;">
 <br>
-  <em>**Note:</em> Volcano plots were originally developed by <strong>Elvira Fleury</strong> and later edited by <strong>Amber Hampton</strong>.
 </div>
-<br>
 <span style="font-size: 15px; font-weight: 800;">6. Pathway Enrichment Analysis (PEA): Figures</span>
 <div style="margin-left: 1.2em;">
   <u>Section 6.1</u> Displays pathway enrichment results for the 4-PFAS mixture
-  as well as individual PFAS using bubble plots summarizing pathway-level signals.***
+  as well as individual PFAS using bubble plots summarizing pathway-level signals.**
 </div>
 <div style="margin-left: 1.2em;">
   <u>Section 6.2</u> Displays sensitivity-analysis pathway enrichment results for
   a 5-PFAS mixture, enabling pathway-level comparison with the primary
-  4-PFAS mixture.***
+  4-PFAS mixture.**
 </div>
 <div style="margin-left: 1.2em;">
   <u>Section 6.3</u> Displays a pathway overlap Venn diagram comparing individual PFAS-specific pathway
-  signals.***
+  signals.**
 </div>
 <div style="margin-left: 1.2em;">
 <br>
-  <em>***Note:</em> Bubbleplots and Venn diagram were originally developed by <strong>Elvira Fleury</strong> and later edited by <strong>Amber Hampton</strong>.
+<br>
+  <em>*Note:</em> These analyses use the Benjamini–Hochberg false discovery rate
+  (BH FDR). An FDR &lt; 0.20 was used as an exploratory threshold to retain a
+  broader set of candidate metabolic features for follow-up investigation.
+<br>
+<br>
+  <em>**Note:</em> Volcano plots, bubbleplots, and the Venn diagram were originally developed by <strong>Elvira Fleury</strong> and later edited by <strong>Amber Hampton</strong>.
 </div>
 </div>
 <br>
@@ -281,13 +278,13 @@ I first secured all needed packages if I did not have these installed already; t
     install.packages("tidyverse")
 </div>
 
-where "tidyverse" can be replaced with any of the packages in the code block below except for MetaboanalystR. MetaboanalystR installation instructions can be found here [(MetaboAnalystR)](https://www.metaboanalyst.ca/docs/RTutorial.xhtml#2.%20Analysis%20Utilities).   
+where "tidyverse" can be replaced with any of the packages in the code block below except for MetaboAnalystR. MetaboAnalystR installation instructions can be found here [(MetaboAnalystR)](https://www.metaboanalyst.ca/docs/RTutorial.xhtml#2.%20Analysis%20Utilities).   
 <br>
 After all packages are appropriately installed, load all necessary packages using the code below.
 
-```{r Libraries,, message=FALSE, warning=FALSE}
+```{r Libraries, message=FALSE, warning=FALSE}
 #Creating an object named libraries with all of the packages I want to load
-libraries <- c("knitr", "tidyverse", "qgcomp", "ggpubr", "MetaboAnalystR", "fitdistrplus", "RJSONIO", "ggplot2", "reshape2", 'grid', 'ggvenn')
+libraries = c("knitr", "tidyverse", "qgcomp", "ggpubr", "MetaboAnalystR", "fitdistrplus", "RJSONIO", "ggplot2", "reshape2", 'grid', 'ggvenn')
 
 #Loading the packages and suppressing all error messages and the function return value
 invisible(sapply(libraries, library, character.only = TRUE))
@@ -353,19 +350,19 @@ Next, I imported the feature data and map files using the code chunk below.
 <br>
 ```{r Import_Feature}
 # Folder containing your restricted CSVs
-data_dir <- file.path(data_root)
+data_dir = file.path(data_root)
 
 # Importing the C18 map file that identifies the IDs
-C18_map <- read.csv(file.path(data_dir, "C18_map_clean.csv"), header = TRUE)
+C18_map = read.csv(file.path(data_dir, "C18_map_clean.csv"), header = TRUE)
 
 # Importing the HILIC map file that identifies the IDs
-HILIC_map <- read.csv(file.path(data_dir, "HILIC_map_clean.csv"), header = TRUE)
+HILIC_map = read.csv(file.path(data_dir, "HILIC_map_clean.csv"), header = TRUE)
 
 # Importing the batch-corrected C18 data
-C18 <- read.csv(file.path(data_dir, "C18_clean.csv"), header = TRUE)
+C18 = read.csv(file.path(data_dir, "C18_clean.csv"), header = TRUE)
 
 # Importing the batch-corrected HILIC data
-HILIC <- read.csv(file.path(data_dir, "HILIC_clean.csv"), header = TRUE)
+HILIC = read.csv(file.path(data_dir, "HILIC_clean.csv"), header = TRUE)
 ```
 
 I then imported the PFAS data. This dataset was named *pfas_only*.
@@ -387,7 +384,7 @@ The headers for *pfas_only* are in the box below.
 
 ```{r Import_PFAS}
 # Importing the PFAS file
-pfas_only <- read.csv(file.path(data_dir, "pfas_clean.csv"), header = TRUE) %>%
+pfas_only = read.csv(file.path(data_dir, "pfas_clean.csv"), header = TRUE) %>%
   mutate(participant_ID = as.character(participant_ID)) #Converting this to a character variable
 ```
 
@@ -409,7 +406,7 @@ For *cov*, the headers are as follows:
 
 ```{r Import_Covariate}
 # Importing covariate data
-cov <- read.csv(file.path(data_dir, "covariates_clean.csv"), header = TRUE)
+cov = read.csv(file.path(data_dir, "covariates_clean.csv"), header = TRUE)
 ```
 
 <h3 style="text-align: center"> 1.3. Creating a Master Dataset</h3>
@@ -427,7 +424,7 @@ This is seen below.
 
 ```{r Master_Dataset}
 # Creating a 'master' PFAS dataset called 'pfas' with both pfas and covariate information
-pfas <- pfas_only %>%
+pfas = pfas_only %>%
   merge(cov, by = "participant_ID") %>%
   merge(C18_map, by = "participant_ID") %>%
   merge(HILIC_map, by = "participant_ID")
@@ -454,35 +451,35 @@ Below is the code I used to create this feature table.
 <br>
 ```{r Feature_Table}
 # Creating a 'participant' file that is a list of participants. 
-participants <- unique(pfas["participant_ID"])
+participants = unique(pfas["participant_ID"])
 
 # Join the C18_map data frame to the participants data frame 
-participants <- inner_join(participants, C18_map, by = "participant_ID")
+participants = inner_join(participants, C18_map, by = "participant_ID")
 
 # Join the HILIC_map data frame to the participants data frame
-participants <- inner_join(participants, HILIC_map, by = "participant_ID")
+participants = inner_join(participants, HILIC_map, by = "participant_ID")
 
 #Creating a string of characters called 'C18_ID' that contain all of the metabolomic-specific IDs for C18 as well as mz, rt, and mode
-C18_ID <- c("mz", "time", "mode", participants$C18_ID)
+C18_ID = c("mz", "time", "mode", participants$C18_ID)
   
 # Selecting only participants from the C18 file that contain both pfas and covariate information
-C18 <- subset(C18, select = C18_ID)
+C18 = subset(C18, select = C18_ID)
 
 #Creating a general metabolomics-specific ID rather than one specific for C18 data
     #As of now participant 1 will correspond to both C18_1 and HILIC_1. Here I drop the C18 portion and replace it with ID changing the value to ID_1. This will allow me to stack the HILIC and C18 data ontop of one another.  
-colnames(C18) <- gsub("C18","ID", colnames(C18)) 
+colnames(C18) = gsub("C18","ID", colnames(C18)) 
   
 #Creating a list called 'HILIC_ID' that contain all of the metabolomic-specific IDs for HILIC as well as mz, rt, and mode
-HILIC_ID <- c("mz", "time", "mode", participants$HILIC_ID)
+HILIC_ID = c("mz", "time", "mode", participants$HILIC_ID)
 
 # Selecting only participants from the HILIC file that contain both pfas and covariate information
-HILIC <- subset(HILIC, select = HILIC_ID)
+HILIC = subset(HILIC, select = HILIC_ID)
 
 #Creating a general metabolomics-specific ID rather than one specific for HILIC data
-colnames(HILIC) <- gsub("HILIC","ID", colnames(HILIC))
+colnames(HILIC) = gsub("HILIC","ID", colnames(HILIC))
   
 # Creating a 'master' dataframe called 'feature' with both the C18 and HILIC data stacked on top of one another
-feature_table <- bind_rows(C18, HILIC)  
+feature_table = bind_rows(C18, HILIC)  
 ```
 
 <h3 style="text-align: center"> 1.4. Splitting Data for Analysis </h3>
@@ -491,18 +488,18 @@ The purpose of this chunk was to create a list that 'splits' each individual fea
 
 ```{r Splitting_For_Analysis}
 # Adding a new feature column named 'feature_id'. This columns contains numbers 1,2,3,...N. This column will be used later for splitting the feature table
-feature_table <- cbind(feature_id = 1:nrow(feature_table), feature_table)
+feature_table = cbind(feature_id = 1:nrow(feature_table), feature_table)
 
 # Pivoting the dataset to a 'long file'. This contains 6 values (feature_ID, mz, time, mode, name [metabolomic-specific participant_ID], and value [ion abundance]). 
-long_df <- feature_table %>% pivot_longer(!c(1:4))
+long_df = feature_table %>% pivot_longer(!c(1:4))
 
 # Replacing the C18 value names to a general ID to match the long_df
-pfas <- pfas  %>%
+pfas = pfas  %>%
   mutate(C18_ID = str_replace(C18_ID, "C18", "ID")) #Dropping the C18 to merge with the long dataset
 
 # Creating a long feature table to analyze
-analysis_pfas <- inner_join(long_df, pfas, by= c("name"= "C18_ID"))
-split_pfas <- split(analysis_pfas, f=analysis_pfas$feature_id)
+analysis_pfas = inner_join(long_df, pfas, by= c("name"= "C18_ID"))
+split_pfas = split(analysis_pfas, f=analysis_pfas$feature_id)
 ```
 <br>
 
@@ -536,7 +533,7 @@ The results of these models are outputted to 3 files, detailed in the box below.
 <h5 style="text-align: center"> **Files Outputted from the 4-PFAS MWAS Code**</h5> 
   <p style="margin: 0; text-indent: 25px"> <u>File 1</u>:* a full or overall file that contains all the results
   <p style="margin: 0; text-indent: 25px"> <u>File 2</u>: a significant file that contains significant values (i.e. those with FDR values <0.20)
-  <p style="margin: 0; text-indent: 25px"> <u>File 3</u>:* a metaboanalyst file that contains only the variables needed to import into metaboanalyst (*mz*, *time*, *p-value*, *mode*).   
+  <p style="margin: 0; text-indent: 25px"> <u>File 3</u>:* a MetaboAnalyst file that contains only the variables needed to import into MetaboAnalyst (*mz*, *time*, *p-value*, *mode*).   
   <br>
 *Files 1 and 3 contain 9 columns. These columns are:
   <ol>
@@ -555,42 +552,42 @@ The results of these models are outputted to 3 files, detailed in the box below.
 
 ```{r QGComp_4_PFAS}
 # Creating a list of exposure names
-Xnm <- c("pfoa_log2","pfos_log2","pfna_log2","pfhxs_log2")
+Xnm = c("pfoa_log2","pfos_log2","pfna_log2","pfhxs_log2")
 
 # Writing a function that loops through each individual features and runs quantile-based g-computation, adjusting for covariates.
-find_psi_4PFAS <- function(list) {
-  num_metabolites <- length(list)
-  res_mat <- matrix(NA, nrow = num_metabolites, ncol = 8)
-  colnames(res_mat) <- c("m.z", "r.t", "psi", "SE", "ci_lower", "ci_upper", "p.value", "mode")
+find_psi_4PFAS = function(list) {
+  num_metabolites = length(list)
+  res_mat = matrix(NA, nrow = num_metabolites, ncol = 8)
+  colnames(res_mat) = c("m.z", "r.t", "psi", "SE", "ci_lower", "ci_upper", "p.value", "mode")
   for (i in 1:num_metabolites) {
-    data_matrix <- as.matrix(list[[i]])
+    data_matrix = as.matrix(list[[i]])
     # Quantile-based g-computation model
-    res <- qgcomp.noboot(value ~ midincome + mom_race + momagedeliv + ct_16w + parity +
+    res = qgcomp.noboot(value ~ midincome + mom_race + momagedeliv + ct_16w + parity +
                            pfoa_log2 + pfos_log2 + pfna_log2 + pfhxs_log2,
                          expnms = Xnm, data = list[[i]], family = gaussian())
     # Outputting needed values
-    res_mat[i, 1] <- as.numeric(list[[i]][1, 2]) # mz
-    res_mat[i, 2] <- as.numeric(list[[i]][1, 3]) # time ie. r.t
-    res_mat[i, 3] <- as.numeric(res$psi) # psi
-    res_mat[i,4] <- as.numeric((res$ci[2]-res$ci[1])/3.92) #SE
-    res_mat[i, 5:6] <- res$ci # upper and lower confidence interval
-    res_mat[i, 7] <- as.numeric(res$pval[2]) # p-value
-    res_mat[i, 8] <- as.numeric(list[[i]][1, 4]) # mode
+    res_mat[i, 1] = as.numeric(list[[i]][1, 2]) # mz
+    res_mat[i, 2] = as.numeric(list[[i]][1, 3]) # time ie. r.t
+    res_mat[i, 3] = as.numeric(res$psi) # psi
+    res_mat[i,4] = as.numeric((res$ci[2]-res$ci[1])/3.92) #SE
+    res_mat[i, 5:6] = res$ci # upper and lower confidence interval
+    res_mat[i, 7] = as.numeric(res$pval[2]) # p-value
+    res_mat[i, 8] = as.numeric(list[[i]][1, 4]) # mode
   }
 
   # Applying the False Discovery Rate (FDR) correction
-  res_df <- data.frame(res_mat)
-  res_df$FDR <- p.adjust(res_df$p.value, method = 'BH')
+  res_df = data.frame(res_mat)
+  res_df$FDR = p.adjust(res_df$p.value, method = 'BH')
   # Re-coding mode to 'negative' and 'positive'
-  res_df$mode[res_df$mode == 1] <- "negative"
-  res_df$mode[res_df$mode == 2] <- "positive"
+  res_df$mode[res_df$mode == 1] = "negative"
+  res_df$mode[res_df$mode == 2] = "positive"
   return(res_df)
 }
 
 # Creating files
-qg_comp_4_FULL <- suppressWarnings(as.data.frame(find_psi_4PFAS(split_pfas)))
-qg_comp_4_SIG <- qg_comp_4_FULL[qg_comp_4_FULL$FDR< 0.2,]
-qg_comp_4_METABOANALYST <- subset(qg_comp_4_FULL, select=c("m.z", "p.value","r.t", "mode"))
+qg_comp_4_FULL = suppressWarnings(as.data.frame(find_psi_4PFAS(split_pfas)))
+qg_comp_4_SIG = qg_comp_4_FULL[qg_comp_4_FULL$FDR< 0.2,]
+qg_comp_4_METABOANALYST = subset(qg_comp_4_FULL, select=c("m.z", "p.value","r.t", "mode"))
 ```
 
 <h3 style="text-align: center"> 2.2. Single Pollutant MWAS</h3>
@@ -603,7 +600,7 @@ The results of these models are outputted to 3 files, detailed in the box below.
 <h5 style="text-align: center"> **Files Outputted from the Single Pollutant PFAS MWAS Code**</h5> 
   <p style="margin: 0; text-indent: 25px"> <u>File 1</u>:* a full or overall file that contains all the results
   <p style="margin: 0; text-indent: 25px"> <u>File 2</u>: a significant file that contains significant values (i.e. those with FDR values <0.20)
-  <p style="margin: 0; text-indent: 25px"> <u>File 3</u>:* a metaboanalyst file that contains only the variables needed to import into metaboanalyst (*mz*, *time*, *p-value*, *mode*).   
+  <p style="margin: 0; text-indent: 25px"> <u>File 3</u>:* a MetaboAnalyst file that contains only the variables needed to import into MetaboAnalyst (*mz*, *time*, *p-value*, *mode*).   
   <br>
 *Files 1 and 3 contain 9 columns. These columns are:
   <ol>
@@ -623,59 +620,59 @@ The results of these models are outputted to 3 files, detailed in the box below.
 
 ```{r Linear_PFAS}
 # Creating the function
-find_linear_pfas <- function(list, PFAS) {
-  num_metabolites <- length(list)
-  res_mat <- matrix(NA, nrow = num_metabolites, ncol = 8) 
-  colnames(res_mat) <- c("m.z", "r.t", "Beta", "SE", "ci_lower", "ci_upper", "p.value", "mode")
+find_linear_pfas = function(list, PFAS) {
+  num_metabolites = length(list)
+  res_mat = matrix(NA, nrow = num_metabolites, ncol = 8) 
+  colnames(res_mat) = c("m.z", "r.t", "Beta", "SE", "ci_lower", "ci_upper", "p.value", "mode")
   for (i in 1:num_metabolites) {
-    data_matrix <- as.matrix(list[[i]])
+    data_matrix = as.matrix(list[[i]])
     # Fitting linear regression model with specified PFAS
-    formula_str <- paste0("value ~ ", PFAS, " + midincome + mom_race + momagedeliv + ct_16w + parity")
-    res <- lm(as.formula(formula_str), data = list[[i]])
+    formula_str = paste0("value ~ ", PFAS, " + midincome + mom_race + momagedeliv + ct_16w + parity")
+    res = lm(as.formula(formula_str), data = list[[i]])
     # Filling in results matrix
-    res_mat[i, 1] <- as.numeric(list[[i]][1, 2]) #mz
-    res_mat[i, 2] <- as.numeric(list[[i]][1, 3]) #time
-    res_mat[i, 3] <- res$coefficients[PFAS] #Beta estimate
-    res_mat[i, 4] <- summary(res)$coefficients[PFAS, "Std. Error"] #standard error
-    res_mat[i, 5:6] <- confint(res, PFAS, level = 0.95) #upper and lower confidence interval
-    res_mat[i, 7] <- summary(res)$coefficients[PFAS, "Pr(>|t|)"] #p-value
-    res_mat[i, 8] <- as.numeric(list[[i]][1, 4]) #mode (i.e. direction)
+    res_mat[i, 1] = as.numeric(list[[i]][1, 2]) #mz
+    res_mat[i, 2] = as.numeric(list[[i]][1, 3]) #time
+    res_mat[i, 3] = res$coefficients[PFAS] #Beta estimate
+    res_mat[i, 4] = summary(res)$coefficients[PFAS, "Std. Error"] #standard error
+    res_mat[i, 5:6] = confint(res, PFAS, level = 0.95) #upper and lower confidence interval
+    res_mat[i, 7] = summary(res)$coefficients[PFAS, "Pr(>|t|)"] #p-value
+    res_mat[i, 8] = as.numeric(list[[i]][1, 4]) #mode (i.e. direction)
   }
   # Converting matrix to data frame and add FDR column
-  res_df <- as.data.frame(res_mat)
-  colnames(res_df) <- colnames(res_mat)
-  res_df$FDR <- p.adjust(res_df$p.value, method = 'BH')
+  res_df = as.data.frame(res_mat)
+  colnames(res_df) = colnames(res_mat)
+  res_df$FDR = p.adjust(res_df$p.value, method = 'BH')
   # Recoding mode column
-  res_df$mode[res_df$mode == 1] <- "negative" #C18
-  res_df$mode[res_df$mode == 2] <- "positive" #HILIC
+  res_df$mode[res_df$mode == 1] = "negative" #C18
+  res_df$mode[res_df$mode == 2] = "positive" #HILIC
   #Returns your wanted values
   return(res_df)
 }
 # Creating the datafiles
   # PFOA
-  PFOA_Full <- find_linear_pfas(split_pfas, "pfoa_log2")
-  PFOA_SIG <- PFOA_Full[PFOA_Full$FDR< 0.2,]
-  PFOA_METABOANALYST <- subset(PFOA_Full, select=c("m.z", "p.value","r.t", "mode"))
+  PFOA_Full = find_linear_pfas(split_pfas, "pfoa_log2")
+  PFOA_SIG = PFOA_Full[PFOA_Full$FDR< 0.2,]
+  PFOA_METABOANALYST = subset(PFOA_Full, select=c("m.z", "p.value","r.t", "mode"))
   
   # PFOS
-  PFOS_Full <- find_linear_pfas(split_pfas, "pfos_log2")
-  PFOS_SIG <- PFOS_Full[PFOS_Full$FDR< 0.2,]
-  PFOS_METABOANALYST <- subset(PFOS_Full, select=c("m.z", "p.value","r.t", "mode"))
+  PFOS_Full = find_linear_pfas(split_pfas, "pfos_log2")
+  PFOS_SIG = PFOS_Full[PFOS_Full$FDR< 0.2,]
+  PFOS_METABOANALYST = subset(PFOS_Full, select=c("m.z", "p.value","r.t", "mode"))
   
   # PFNA
-  PFNA_Full <- find_linear_pfas(split_pfas, "pfna_log2")
-  PFNA_SIG <- PFNA_Full[PFNA_Full$FDR< 0.2,]
-  PFNA_METABOANALYST <- subset(PFNA_Full, select=c("m.z", "p.value","r.t", "mode"))
+  PFNA_Full = find_linear_pfas(split_pfas, "pfna_log2")
+  PFNA_SIG = PFNA_Full[PFNA_Full$FDR< 0.2,]
+  PFNA_METABOANALYST = subset(PFNA_Full, select=c("m.z", "p.value","r.t", "mode"))
   
   # PFHxS
-  PFHxS_Full <- find_linear_pfas(split_pfas, "pfhxs_log2")
-  PFHxS_SIG <- PFHxS_Full[PFHxS_Full$FDR< 0.2,]
-  PFHxS_METABOANALYST <- subset(PFHxS_Full, select=c("m.z", "p.value","r.t", "mode"))
+  PFHxS_Full = find_linear_pfas(split_pfas, "pfhxs_log2")
+  PFHxS_SIG = PFHxS_Full[PFHxS_Full$FDR< 0.2,]
+  PFHxS_METABOANALYST = subset(PFHxS_Full, select=c("m.z", "p.value","r.t", "mode"))
   
   # MEFOSAA
-  MEFOSAA_Full <- find_linear_pfas(split_pfas, "me_pfosa_acoh_log2")
-  MEFOSAA_SIG <- MEFOSAA_Full[MEFOSAA_Full$FDR< 0.2,]
-  MEFOSAA_METABOANALYST <- subset(MEFOSAA_Full, select=c("m.z", "p.value","r.t", "mode"))
+  MEFOSAA_Full = find_linear_pfas(split_pfas, "me_pfosa_acoh_log2")
+  MEFOSAA_SIG = MEFOSAA_Full[MEFOSAA_Full$FDR< 0.2,]
+  MEFOSAA_METABOANALYST = subset(MEFOSAA_Full, select=c("m.z", "p.value","r.t", "mode"))
 ```
 
 <h3 style="text-align: center"> 2.3. Sensitivity MWAS (5-PFAS) </h3>
@@ -688,7 +685,7 @@ The results of these models are outputted to 3 files:
 <h5 style="text-align: center"> **Files Outputted from the 5-PFAS MWAS Code**</h5> 
   <p style="margin: 0; text-indent: 25px"> <u>File 1</u>:* a full or overall file that contains all the results
   <p style="margin: 0; text-indent: 25px"> <u>File 2</u>: a significant file that contains significant values (i.e. those with FDR values <0.20)
-  <p style="margin: 0; text-indent: 25px"> <u>File 3</u>:* a metaboanalyst file that contains only the variables needed to import into metaboanalyst (*mz*, *time*, *p-value*, *mode*).   
+  <p style="margin: 0; text-indent: 25px"> <u>File 3</u>:* a MetaboAnalyst file that contains only the variables needed to import into MetaboAnalyst (*mz*, *time*, *p-value*, *mode*).   
   <br>
 *Files 1 and 3 contain 9 columns. These columns are:
   <ol>
@@ -708,50 +705,50 @@ The results of these models are outputted to 3 files:
 
 ```{r QGComp_PFAS_MeFOSAA}
 # Create a exposure list of the names of each of the 5 PFAS
-Xnm <- c("pfoa_log2","pfos_log2","pfna_log2","pfhxs_log2", "me_pfosa_acoh_log2")
+Xnm = c("pfoa_log2","pfos_log2","pfna_log2","pfhxs_log2", "me_pfosa_acoh_log2")
 
 # Writing a function that loops through each individual features and runs quantile-based g-computation, adjusting for covariates.
-find_psi_4PFAS_and_ME_PFOSA <- function(list) {
-  num_metabolites <- length(list)
-  res_mat <- matrix(NA, nrow = num_metabolites, ncol = 8)
-  colnames(res_mat) <- c("m.z", "r.t", "psi", "SE", "ci_lower", "ci_upper", "p.value", "mode")
+find_psi_4PFAS_and_ME_PFOSA = function(list) {
+  num_metabolites = length(list)
+  res_mat = matrix(NA, nrow = num_metabolites, ncol = 8)
+  colnames(res_mat) = c("m.z", "r.t", "psi", "SE", "ci_lower", "ci_upper", "p.value", "mode")
   for (i in 1:num_metabolites) {
-    data_matrix <- as.matrix(list[[i]])
+    data_matrix = as.matrix(list[[i]])
     # Quantile G-comp model
-    res <- qgcomp.noboot(value ~ midincome + mom_race + momagedeliv + ct_16w + parity +
+    res = qgcomp.noboot(value ~ midincome + mom_race + momagedeliv + ct_16w + parity +
                            pfoa_log2 + pfos_log2 + pfna_log2 + pfhxs_log2 + 
                            me_pfosa_acoh_log2,
                          expnms = Xnm, data = list[[i]], family = gaussian())
     # Outputting needed values
-    res_mat[i, 1] <- as.numeric(list[[i]][1, 2]) # mz
-    res_mat[i, 2] <- as.numeric(list[[i]][1, 3]) # time ie. r.t
-    res_mat[i, 3] <- as.numeric(res$psi) # psi
-    res_mat[i,4] <- as.numeric((res$ci[2]-res$ci[1])/3.92) #SE
-    res_mat[i, 5:6] <- res$ci # upper and lower confidence interval
-    res_mat[i, 7] <- as.numeric(res$pval[2]) # p-value
-    res_mat[i, 8] <- as.numeric(list[[i]][1, 4]) # mode
+    res_mat[i, 1] = as.numeric(list[[i]][1, 2]) # mz
+    res_mat[i, 2] = as.numeric(list[[i]][1, 3]) # time ie. r.t
+    res_mat[i, 3] = as.numeric(res$psi) # psi
+    res_mat[i,4] = as.numeric((res$ci[2]-res$ci[1])/3.92) #SE
+    res_mat[i, 5:6] = res$ci # upper and lower confidence interval
+    res_mat[i, 7] = as.numeric(res$pval[2]) # p-value
+    res_mat[i, 8] = as.numeric(list[[i]][1, 4]) # mode
   }
   # Applying the FDR correction
-  res_df <- data.frame(res_mat)
-  res_df$FDR <- p.adjust(res_df$p.value, method = 'BH')
-  # Recoding mode to 'megative' and 'positive'
-  res_df$mode[res_df$mode == 1] <- "negative"
-  res_df$mode[res_df$mode == 2] <- "positive"
+  res_df = data.frame(res_mat)
+  res_df$FDR = p.adjust(res_df$p.value, method = 'BH')
+  # Recoding mode to 'negative' and 'positive'
+  res_df$mode[res_df$mode == 1] = "negative"
+  res_df$mode[res_df$mode == 2] = "positive"
   return(res_df)
 }
 # Creating files
-qg_comp_5_FULL <- suppressWarnings(as.data.frame(find_psi_4PFAS_and_ME_PFOSA(split_pfas)))
-qg_comp_5_SIG <- qg_comp_5_FULL[qg_comp_5_FULL$FDR< 0.2,]
-qg_comp_5_METABOANALYST <- subset(qg_comp_5_FULL, select=c("m.z", "p.value","r.t", "mode"))
+qg_comp_5_FULL = suppressWarnings(as.data.frame(find_psi_4PFAS_and_ME_PFOSA(split_pfas)))
+qg_comp_5_SIG = qg_comp_5_FULL[qg_comp_5_FULL$FDR< 0.2,]
+qg_comp_5_METABOANALYST = subset(qg_comp_5_FULL, select=c("m.z", "p.value","r.t", "mode"))
 ```
 
 <h2 style="text-align: center"> **3. Pathway Enrichment Analysis** </h2>
 
-<h3 style="text-align: center"> 3.0. Brief Background: MetaboanalystR </h3>
+<h3 style="text-align: center"> 3.0. Brief Background: MetaboAnalystR </h3>
 
 MetaboAnalystR is the R package associated with MetaboAnalyst. MetaboAnalystR performs a pathway enrichment analysis (PEA) using *mummichog* to identify associations between an exposure of interest, such as PFAS, and metabolic pathways. More information on *mummichog* can be found here [(Li et al.)](https://pubmed.ncbi.nlm.nih.gov/23861661/).   
 <br>
-Furthermore, information on the theory behind Metaboanalyst can be found here [(MetaboAnalyst)](https://www.metaboanalyst.ca/). Information on MetaboAnalystR (coding Metaboanalyst in R specifically) can be found at [(MetaboanalystR)](https://www.metaboanalyst.ca/docs/RTutorial.xhtml).
+Furthermore, information on the theory behind MetaboAnalyst can be found here [(MetaboAnalyst)](https://www.metaboanalyst.ca/). Information on MetaboAnalystR (coding MetaboAnalyst in R specifically) can be found at [(MetaboanalystR)](https://www.metaboanalyst.ca/docs/RTutorial.xhtml).
 
 <h3 style="text-align: center"> 3.1. Adduct Specification </h3>
 
@@ -761,7 +758,7 @@ A full list of the adducts available for MetaboAnalyst can be found here [(adduc
 
 ```{r Adduct_Customization}
 # Creating a vector that contains the customized adducts for this study. 
-add.vec <- c("M+FA-H [1-]","M-H [1-]","2M-H [1-]","M-H+O [1-]","M(C13)-H [1-]",
+add.vec = c("M+FA-H [1-]","M-H [1-]","2M-H [1-]","M-H+O [1-]","M(C13)-H [1-]",
              "2M+FA-H [1-]","M-3H [3-]","M-2H [2-]","M+ACN-H [1-]",
              "M+HCOO [1-]","M+CH3COO [1-]","M-H2O-H [1-]","M [1+]","M+H [1+]",
              "M+2H [2+]","M+3H [3+]","M+H2O+H [1+]","M-H2O+H [1+]",
@@ -789,43 +786,50 @@ Details regarding the untargeted analysis are described in detail in my first au
 
 ```{r PEA_4PFAS, message=FALSE, warning=FALSE, results='hide'}
 # Creating an object for storing data for mummichog
-mSet4 <- MetaboAnalystR::InitDataObjects("mass_all", "mummichog", FALSE, default.dpi = 72)
+mSet4 = InitDataObjects("mass_all", "mummichog", FALSE, default.dpi = 72)
 
 # Ranking the peaks by their p-value
-mSet4 <- SetPeakFormat(mSet4, "rmp") 
+mSet4= SetPeakFormat(mSet4, "rmp") 
 
-# Specifying
+# Specifying instrument parameters
     #a. a mass tolerance of 5.0
     #b. mixed mode
-    #c.not enforcing primary ions as this is exploratory
-mSet4 <- UpdateInstrumentParameters(mSet4, 5.0, "mixed", "no"); 
+    #c. not enforcing primary ions. 
+mSet4=UpdateInstrumentParameters(mSet4, 5.0, "mixed", "no"); 
+  
+# Reading in the specific peak list. You will need to specify your specific filepath here
+peak_path_4pfas = file.path(final_root, "Metaboanalyst", "QG_comp_full_METABOLOMICS_4PFAS.csv")
 
-# Reading in the specific peak list
-peak_file_4 <- if (dir.exists("/final_datasets")) "/final_datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS.csv" else "/Users/amber/Desktop/Metabolomics/Final Datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS.csv"
-mSet4 <- MetaboAnalystR::Read.PeakListData(mSet4, peak_file_4)
+# Building a temp destination path (same filename; avoids path-with-spaces issues)
+tmp_path = file.path(tempdir(), basename(peak_path_4pfas))
 
+# Copying the file into temp storage (this will overwrite your file if it already exists)
+file.copy(from = peak_path_4pfas, to = tmp_path, overwrite = TRUE)
+
+# Importing the specific peaklist into MetaboAnalystR
+mSet4 = Read.PeakListData(mSet4, tmp_path)
 
 # Performing a sanity check to ensure the data is in a suitable format for further analysis
-mSet4 <- SanityCheckMummichogData(mSet4)
+mSet4=SanityCheckMummichogData(mSet4)
 
 # Adding in the adduct data
-mSet4 <- Setup.AdductData(mSet4, add.vec); 
+mSet4=Setup.AdductData(mSet4, add.vec); 
 
 # Specifying both positive and negative adducts
-mSet4 <- PerformAdductMapping(mSet4, "mixed") 
+mSet4=PerformAdductMapping(mSet4, "mixed") 
 
 # Running the mummichog algorithm using selected adducts and version 2 of the mummichog algorithm
-mSet4 <- SetPeakEnrichMethod(mSet4, "mum", "v2")
-mSet4 <- SetMummichogPval(mSet4, .05) #Specifying a p-value of 0.05
+mSet4=SetPeakEnrichMethod(mSet4, "mum", "v2")
+mSet4=SetMummichogPval(mSet4, .05) #Specifying a p-value of 0.05
 
 # Selecting the human MFN network, selecting the current human MFN library, restricting to metabolite datasets with at least 3 entries, and running 10,000 permutations. 
-mSet4 <- PerformPSEA(mSet4, "hsa_mfn", "current", 3 , 10000)
+mSet4=PerformPSEA(mSet4, "hsa_mfn", "current", 3 , 10000)
 
 # Storing the results as a dataframe
-mummi_results_4pfas <- as.data.frame(mSet4$mummi.resmat)
+mummi_results_4pfas= as.data.frame(mSet4$mummi.resmat)
 
 # Restricting the results to those with a p(gamma) <0.05
-mummi_results_4pfas <- mummi_results_4pfas[mummi_results_4pfas$Gamma< 0.05, ]
+mummi_results_4pfas = mummi_results_4pfas[mummi_results_4pfas$Gamma< 0.05, ]
 ```
 
 <h3 style="text-align: center"> 3.3. Single Pollutant PEA </h3>
@@ -847,63 +851,46 @@ Details regarding the untargeted analysis are described in detail in my first au
 
 ```{r PEA_Individual_PFAS, message=FALSE, warning=FALSE, results='hide'}
 # Creating a list of the PFAS we are evaluating
-PFAS_vec <- c("PFOA", "PFOS", "PFHxS", "PFNA", "MEFOSAA")
+PFAS_vec = c("PFOA", "PFOS", "PFHxS", "PFNA", "MEFOSAA")
 
 # Creating an empty list to store the results for each PFAS
-results_list <- list()
+results_list = list()
 
 # Creating a loop to loop through each PFAS and output the results
 for (pfas in PFAS_vec) {
-
   # Creating an object for storing data for mummichog
-  mSet <- InitDataObjects("mass_all", "mummichog", FALSE, default.dpi = 72)
-
+  mSet = InitDataObjects("mass_all", "mummichog", FALSE, default.dpi = 72)
   # Ranking the peaks by their p-value
-  mSet <- SetPeakFormat(mSet, "rmp")
-
+  mSet = SetPeakFormat(mSet, "rmp")
   # Specifying instrument parameters
-  mSet <- UpdateInstrumentParameters(mSet, 5.0, "mixed", "no")
-
-  # Reading in the specific peak list
-  metabo_dir <- if (dir.exists("/final_datasets")) {
-    "/final_datasets/Metaboanalyst/Individual PFAS"
-  } else {
-    "/Users/amber/Desktop/Metabolomics/Final Datasets/Metaboanalyst/Individual PFAS"
-  }
-
-  file_path <- file.path(metabo_dir, paste0(pfas, "_METABOANALYST.csv"))
-
-  # (Fix for spaces in file paths) Copy to a temp file without spaces, then read
-  tmp_path <- file.path(tempdir(), paste0(pfas, "_METABOANALYST.csv"))
-  stopifnot(file.exists(file_path))
-  file.copy(file_path, tmp_path, overwrite = TRUE)
-
-  mSet <- Read.PeakListData(mSet, tmp_path)
-
-  # Performing a sanity check
-  mSet <- SanityCheckMummichogData(mSet)
-
+  mSet = UpdateInstrumentParameters(mSet, 5.0, "mixed", "no")
+  # Reading in the specific peak list. You will need to specify your specific filepath here
+  metabo_dir = file.path(final_root, "Metaboanalyst", "Individual PFAS")
+  # Building the full path to the PFAS-specific peak list
+  file_path = file.path(metabo_dir, paste0(pfas, "_METABOANALYST.csv"))
+  # Building a temp destination path (same filename; avoids path-with-spaces issues)
+  tmp_path = file.path(tempdir(), basename(file_path))
+  # Copying the file into temp storage (this will overwrite your file if it already exists)
+  file.copy(from = file_path, to = tmp_path, overwrite = TRUE)
+  # Importing the specific peaklist into MetaboAnalystR
+  mSet = Read.PeakListData(mSet, tmp_path)
+  # Performing a sanity check (i.e. quality/format check to ensure it's usable in MetaboAnalyst R)
+  mSet = SanityCheckMummichogData(mSet)
   # Adding in the adduct data
-  mSet <- Setup.AdductData(mSet, add.vec)
-
+  mSet = Setup.AdductData(mSet, add.vec)
   # Specifying both positive and negative adducts
-  mSet <- PerformAdductMapping(mSet, "mixed")
-
+  mSet = PerformAdductMapping(mSet, "mixed")
   # Running the mummichog algorithm using selected adducts and version 2 of the mummichog algorithm
-  mSet <- SetPeakEnrichMethod(mSet, "mum", "v2")
-
+  mSet = SetPeakEnrichMethod(mSet, "mum", "v2")
   # Specifying a p-value of 0.05
-  mSet <- SetMummichogPval(mSet, 0.05)
-
+  mSet = SetMummichogPval(mSet, 0.05)
   # Selecting the human MFN network, selecting the current human MFN library,
   # restricting to metabolite datasets with at least 3 entries, and running 10,000 permutations
-  mSet <- PerformPSEA(mSet, "hsa_mfn", "current", 3, 10000)
-
+  mSet = PerformPSEA(mSet, "hsa_mfn", "current", 3, 10000)
   # Storing the results as a dataframe
-  results_list[[pfas]] <- as.data.frame(mSet$mummi.resmat)
-
+  results_list[[pfas]] = as.data.frame(mSet$mummi.resmat)
   # Restricting the results to those with a p(gamma) < 0.05
-  results_list[[pfas]] <- results_list[[pfas]][results_list[[pfas]]$Gamma < 0.05, ]
+  results_list[[pfas]] = results_list[[pfas]][results_list[[pfas]]$Gamma < 0.05, ]
 }
 ```
 
@@ -925,109 +912,137 @@ Details regarding the untargeted analysis are described in detail in my first au
 
 ```{r PEA_5PFAS, message=FALSE, warning=FALSE, results='hide'}
 # Creating an object for storing data for mummichog
-mSet5 <- InitDataObjects("mass_all", "mummichog", FALSE, default.dpi = 72)
+mSet5 = InitDataObjects("mass_all", "mummichog", FALSE, default.dpi = 72)
 
-# Ranking the peaks by thei p-value
-mSet5<- SetPeakFormat(mSet5, "rmp") 
+# Ranking the peaks by their p-value
+mSet5= SetPeakFormat(mSet5, "rmp") 
 
-# Specifying
+# Specifying instrument parameters
     #a. a mass tolerance of 5.0
     #b. mixed mode
     #c. not enforcing primary ions. 
-mSet5<-UpdateInstrumentParameters(mSet5, 5.0, "mixed", "no"); 
+mSet5=UpdateInstrumentParameters(mSet5, 5.0, "mixed", "no"); 
+  
+# Reading in the specific peak list. You will need to specify your specific filepath here
+peak_path_5pfas = file.path(final_root, "Metaboanalyst", "QG_comp_full_METABOLOMICS_4PFAS_and_ME_PFOSA.csv")
 
-# Reading in the specific peak list
-# Reading in the specific peak list
-mSet5 <- Read.PeakListData(mSet5, if (dir.exists("/final_datasets")) {"/final_datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS_and_ME_PFOSA.csv"} 
-                           else {"/Users/amber/Desktop/Metabolomics/Final Datasets/Metaboanalyst/QG_comp_full_METABOLOMICS_4PFAS_and_ME_PFOSA.csv"})
+# Building a temp destination path (same filename; avoids path-with-spaces issues)
+tmp_path = file.path(tempdir(), basename(peak_path_5pfas))
+
+# Copying the file into temp storage (this will overwrite your file if it already exists)
+file.copy(from = peak_path_5pfas, to = tmp_path, overwrite = TRUE)
+
+# Importing the specific peaklist into MetaboAnalystR
+mSet5 = Read.PeakListData(mSet5, tmp_path)
 
 # Performing a sanity check to ensure the data is in a suitable format for further analysis
-mSet5<-SanityCheckMummichogData(mSet5)
+mSet5=SanityCheckMummichogData(mSet5)
 
 # Adding in the adduct data
-mSet5<-Setup.AdductData(mSet5, add.vec); 
+mSet5=Setup.AdductData(mSet5, add.vec); 
 
 # Specifying both positive and negative adducts
-mSet5<-PerformAdductMapping(mSet5, "mixed") 
+mSet5=PerformAdductMapping(mSet5, "mixed") 
 
 # Running the mummichog algorithm using selected adducts and version 2 of the mummichog algorithm
-mSet5<-SetPeakEnrichMethod(mSet5, "mum", "v2")
-mSet5<-SetMummichogPval(mSet5, .05) #Specifying a p-value of 0.05
+mSet5=SetPeakEnrichMethod(mSet5, "mum", "v2")
+mSet5=SetMummichogPval(mSet5, .05) #Specifying a p-value of 0.05
 
 # Selecting the human MFN network, selecting the current human MFN library, restricting to metabolite datasets with at least 3 entries, and running 10,000 permutations. 
-mSet5<-PerformPSEA(mSet5, "hsa_mfn", "current", 3 , 10000)
+mSet5=PerformPSEA(mSet5, "hsa_mfn", "current", 3 , 10000)
 
 # Storing the results as a dataframe
-mummi_results_5pfas<- as.data.frame(mSet5$mummi.resmat)
+mummi_results_5pfas= as.data.frame(mSet5$mummi.resmat)
 
 # Restricting the results to those with a p(gamma) <0.05
-mummi_results_5pfas <- mummi_results_5pfas[mummi_results_5pfas$Gamma< 0.05, ]
+mummi_results_5pfas = mummi_results_5pfas[mummi_results_5pfas$Gamma< 0.05, ]
 ```
 <br>
 <br>
 
 <h1 style="text-align: center"> **Figures and Table Code** </h1>
-Below is the code I used to generate many of the figures and the descriptive table presented in my first-author, peer-reviewed publication <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515" target="_blank" rel="noopener noreferrer">(Hall et al.)</a>. This section is intended to serve both as a practical guide for people to understand, adapt, or extend these analyses. For ease of navigation, the code is organized into three main sections, corresponding to the major figure types and analytic stages of the study. These sections are detailed under 'Workflow & Deliverables' under the subheader "Figures and Table Code". 
+Below is the code I used to generate many of the figures and the descriptive table presented in my first-author paper <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515" target="_blank" rel="noopener noreferrer">(Hall et al.)</a>. This section is intended to serve as a practical guide for people to understand, adapt, or extend these analyses. For ease of navigation, I organized the code into three main sections, corresponding to the major figure types and analytic stages of the study. These sections are detailed under 'Workflow & Deliverables' under the subheader "Figures and Table Code". 
 
 <h2 style="text-align: center"> **4. Exploratory Data Analysis** </h2>
 <h3 style="text-align: center"> 4.1. PFAS Correlation Heatmap </h3>
 
-In order to better understand the relationships among the different PFAS exposures (PFOS, PFOA, PFNA, PFHxS, and MeFOSAA), I created a heatmap summarizing pairwise correlations. This heatmap displays Spearman correlation coefficients calculated using non–log-transformed PFAS concentrations.
+In order to better understand the relationships among the different PFAS exposures in the HOME study (PFOS, PFOA, PFNA, PFHxS, and MeFOSAA), I created a heatmap summarizing pairwise correlations. This heatmap displays Spearman correlation coefficients calculated using non–log-transformed PFAS concentrations. 
 
-Spearman correlations were chosen because the non-transformed PFAS distributions were not normally distributed, making Pearson correlations less appropriate. Spearman’s rank-based approach does not rely on distributional assumptions and is therefore more robust to skewed exposure data. That said, Pearson correlations using log-transformed PFAS concentrations would also be a reasonable alternative and yield complementary information.
+I chose Spearman correlations because the non-transformed PFAS distributions were not normally distributed, making Pearson correlations less appropriate. Spearman’s rank-based approach does not rely on distributional assumptions and is therefore more robust to skewed exposure data. That said, Pearson correlations using log-transformed PFAS concentrations would also be a reasonable alternative and yield complementary information.
 
 To generate this figure, I imported the non-transformed PFAS dataset, selected the relevant exposure variables, and computed pairwise Spearman correlation coefficients, which were then visualized as a heatmap.
 ```{r Heatmap1}
 # Importing the file containing the non-transformed pfas data
-full_cov_pfas <- read.csv(file.path(data_dir, "pfas_not_transformed.csv"))
+full_cov_pfas = read.csv(file.path(data_dir, "pfas_not_transformed.csv"))
 
 # Selecting specific columns
-cor_cols <- dplyr::select(full_cov_pfas, PFOA, PFNA, PFHxS, PFOS, MeFOSAA)
+cor_cols = dplyr::select(full_cov_pfas, PFOA, PFNA, PFHxS, PFOS, MeFOSAA)
 
-# Calculating correlation matrix and rounding off the values
-cormat <- round(cor(cor_cols, method = "spearman", use = "pairwise.complete.obs"), 2)
+# Calculating the correlation matrix and rounding off the values
+cormat = round(cor(cor_cols, method = "spearman", use = "pairwise.complete.obs"), 2)
 ```
 <br>
 After calculating the Spearman correlation coefficients, I created the heatmap using this code:
 ```{r Heatmap2}
-# Keep upper triangle only (blank out lower triangle)
-cormat[lower.tri(cormat)] <- NA
+# Keep upper triangle only ('blank' out lower triangle)
+cormat[lower.tri(cormat)] = NA
 
 # Melting the correlation matrix and removing NA values
-melted_cormat <- melt(cormat, na.rm = TRUE)
-melted_cormat$value <- as.numeric(melted_cormat$value)
+melted_cormat = melt(cormat, na.rm = TRUE)
+melted_cormat$value = as.numeric(melted_cormat$value)
 
 # Creating a heatmap of Spearman Correlation coefficients
-spearman_cor <- ggplot(data = melted_cormat, aes(Var2, Var1, fill = value)) +
+spearman_cor = ggplot(data = melted_cormat, aes(Var2, Var1, fill = value)) +
   geom_tile(color = "white") +
-  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
-                      midpoint = 0, limit = c(-1, 1), space = "Lab", 
-                      name = "Spearman\nCorrelation") +
+  scale_fill_gradient2(
+    low = "blue", 
+    high = "red", 
+    mid = "white", 
+    midpoint = 0, 
+    limits = c(-1, 1), 
+    space = "Lab", 
+    name = "Spearman\nCorrelation") +
   labs(title = paste(
-      strwrap("Figure 1. Spearman correlation coefficients between maternal serum PFAS in the HOME Study (2003 to 2006; N = 264)", width = 70), collapse = "\n"), x = NULL, y = NULL) +
+    strwrap("Figure 1. Spearman correlation coefficients between maternal serum PFAS in the HOME Study (2003 to 2006; N = 264)", 
+            width = 70), 
+    collapse = "\n"), 
+    x = NULL, y = NULL) +
   theme_minimal() + 
   theme(plot.title = element_text(
-      face = "bold",
+    face = "bold",
       hjust = 0.4,   
       size = 13,
-      family = "Times New Roman"),
-    axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1, family = "Times New Roman"), 
-        axis.text.y = element_text(size = 12, hjust = 0, family = "Times New Roman"), 
-        axis.title.x = element_blank(),  
-        axis.title.y = element_blank(), 
-        legend.text = element_text(family = "Times New Roman"), 
-        legend.title = element_text(family = "Times New Roman"), 
-        panel.grid.major = element_blank(), 
-        panel.border = element_blank(), 
-        panel.background = element_blank(), 
-        axis.ticks = element_blank(), 
-        legend.justification = c(1, 0), 
-        legend.position = c(0.4, 0.7), 
-        legend.direction = "horizontal") +
-  coord_fixed() + 
-  geom_text(aes(Var2, Var1, label = value), color = "black", size = 4, family = "Times New Roman") +
-  guides(fill = guide_colorbar(barwidth = 7, barheight = 1, 
-                               title.position = "top", title.hjust = 0.5)) +
+      family = "Times"),
+    axis.text.x = element_text(
+      angle = 45, 
+      vjust = 1, 
+      size = 12, 
+      hjust = 1, 
+      family = "Times"), 
+    axis.text.y = element_text(size = 12, 
+                               hjust = 0, 
+                               family = "Times"), 
+    axis.title.x = element_blank(),  
+    axis.title.y = element_blank(), 
+    legend.text = element_text(family = "Times"), 
+    legend.title = element_text(family = "Times"), 
+    panel.grid.major = element_blank(), 
+    panel.border = element_blank(), 
+    axis.ticks = element_blank(), 
+    legend.justification = c(1, 0), 
+    legend.position = c(0.4, 0.7), 
+    legend.direction = "horizontal") +
+    coord_fixed() + 
+  geom_text(
+    aes(Var2, Var1, label = value), 
+    color = "black", 
+    size = 4, 
+    family = "Times") +
+  guides(fill = guide_colorbar(
+    barwidth = 7, 
+    barheight = 1, 
+    title.position = "top", 
+    title.hjust = 0.5)) +
   scale_y_discrete(position = "right")
 
 print(spearman_cor)
@@ -1035,124 +1050,208 @@ print(spearman_cor)
 
 <h3 style="text-align: center"> 4.2. PFAS Violin Plots </h3>
 
-In my published first-author paper, PFAS distributions were summarized in a table rather than shown graphically. This decision was made as the spread of their concentrations differ substantially, making PFNA, PFHxS, and MeFOSAA difficult to read. However, I provide this code for readers who prefer a visual representation of PFAS distributions or who wish to adapt the plotting workflow for their own analyses.
+In my paper, PFAS distributions were summarized in a table rather than shown graphically. This decision was made as the spread of their concentrations differ substantially, making PFNA, PFHxS, and MeFOSAA difficult to read. However, I provide this code for readers who prefer a visual representation of PFAS distributions.
 
-To summarize the distributions of prenatal PFAS concentrations, I used violin plots. Violin plots display the full distribution of each PFAS, allowing comparison of distributional patterns across compounds without grouping or binning the data. I overlay the violin plots with box plots to provide a compact summary of the median and interquartile range. Because PFAS concentrations differ substantially in scale across compounds in my study, I also include a median (IQR) table beneath the figure to ensure that PFAS with smaller concentration ranges remain interpretable.
-```{r Violin_Plots}
+To summarize the distributions of prenatal PFAS concentrations, I use violin plots. Violin plots display the full distribution of each PFAS, allowing comparison of distributional patterns across compounds without grouping or binning the data. I overlay the violin plots with box plots to provide a compact summary of the median and interquartile range. Because concentrations differ substantially in scale across PFAS in this study, I also include a median (interquartile range [IQR]) table beneath the figure to ensure that PFAS with smaller concentration ranges remain interpretable.
+
+Before I make the violin plots, I first prepare the data. I do this by performing the following actions:
+
+<ol>
+  <li>Mapping colors consistently by PFAS</li>
+  <li>Transforming PFAS concentrations into a long format suitable for ggplot2</li>
+  <li>Computing the median and interquartile range (IQR) for each PFAS</li>
+  <li>Ordering the PFAS from highest to lowest median concentration.</li>
+  <li>Applying my PFAS ordering to the long-format plotting dataset and the summary table</li>
+  <li>Apply this ordering to both the long-format plotting dataset and the summary table to ensure that the violins and the median (IQR) table align consistently</li>
+</ol>
+ 
+ The code for this step is as follows:
+```{r Violin_Plots1}
 # Note. This plot uses the non–log-transformed PFAS data that were previously imported for the correlation heatmap. The corresponding data import step is commented out below and provided for reference and reuse.
-
+#
 # Importing the file containing the non-transformed pfas data
-#full_cov_pfas <- read.csv(file.path(data_dir, "pfas_not_transformed.csv"))
+#full_cov_pfas = read.csv(file.path(data_dir, "pfas_not_transformed.csv"))
 
 # Assigning colors to each PFAS
-pfas_colors <- c(
+pfas_colors = c(
   "PFOA" = "#3C8DC4",
   "PFNA" = "#FF9A3F",
   "PFHxS" = "#942E2E",
-  "PFOS" = "hotpink",
-  "MeFOSAA" = "black")
+  "PFOS" = "#FF69B4",
+  "MeFOSAA" = "#000000")
 
-# Calculating the median (IQR) for each PFAS. This will provide a table at the bottom of my violin plots with medians and IQR for each PFAS.  
-pfas_medians <- full_cov_pfas %>%
-  tidyr::pivot_longer(cols = names(pfas_colors),
-    names_to = "Chemical",
-    values_to = "Concentration") %>%
+# Reshaping the data and ordering
+pfas_long = full_cov_pfas %>%
+  pivot_longer(
+    cols = names(pfas_colors), 
+    names_to = "Chemical", 
+    values_to = "Concentration")
+
+# Calculating the median (IQR) for each PFAS. 
+pfas_medians = pfas_long %>%
   dplyr::group_by(Chemical) %>%
   dplyr::summarise(
     Median = round(median(Concentration, na.rm = TRUE), 2),
-    Q1     = round(stats::quantile(Concentration, 0.25, na.rm = TRUE), 2),
-    Q3     = round(stats::quantile(Concentration, 0.75, na.rm = TRUE), 2),
-    .groups = "drop") %>%
-  dplyr::mutate(Median_IQR = sprintf("%.2f (%.2f to %.2f)", Median, Q1, Q3))
+    Q1 = round(quantile(Concentration, 0.25, na.rm = TRUE), 2),
+    Q3 = round(quantile(Concentration, 0.75, na.rm = TRUE), 2), .groups = "drop") %>%
+  mutate(Median_IQR = sprintf("%.2f (%.2f to %.2f)", Median, Q1, Q3))
 
-# Reversing the order so it presents from high to low
-PFAS_order <- rev(pfas_medians$Chemical)
+# Ordering PFAS from largest to smallest median concentration
+PFAS_order = pfas_medians %>%
+  arrange(desc(Median)) %>%
+  pull(Chemical)
 
-# Reshaping the data
-pfas_long <- full_cov_pfas %>%
-  pivot_longer(cols = names(pfas_colors), names_to = "Chemical", values_to = "Concentration") %>%
+# Applying the PFAS order to the long-format data
+pfas_long = pfas_long %>%
   mutate(Chemical = factor(Chemical, levels = PFAS_order))
 
+# Applying the same PFAS order to the summary table
+pfas_medians = pfas_medians %>%
+  mutate(Chemical = factor(Chemical, levels = PFAS_order))
+```
+
+Next, I generate the violin plots and overlay a boxplot to provide a compact summary of the median and IQR.
+```{r Violin_Plots2}
+# Making the violin plot with a boxplot overlay
+violin_plot = ggplot(
+  pfas_long,                                  
+  aes(
+    x = Chemical,                              
+    y = Concentration,                         
+    fill = Chemical)) +  
+  
+  #Creating the violin plots
+  geom_violin(
+    trim = FALSE, # Showing the full density tails
+    scale = "width", # Making all violins the same maximum width (easier comparison)
+    adjust = 1.2, # Smoothing the density curve slightly
+    color = "black") + # Outlining each violin in black
+
+  # Creating the boxplot overlay
+  geom_boxplot(
+    width = 0.4, # Width of the box inside each violin
+    fill = "white", 
+    alpha = 0.4,                               
+    outlier.shape = NA, # Hiding outlier points (it looks too busy otherwise)
+    color = "black") +
+  labs(
+    title = paste(                        
+      strwrap(
+        "Figure 2. Concentrations of maternal serum PFAS in the HOME Study (2003 to 2006; N = 264)",
+        width = 70),
+      collapse = "\n"),
+    x = NULL, # Removing x-axis title (PFAS names already shown)
+    y = expression(bold("Concentration (ng/mL)"))) +
+  
+  # Applying the pre-specified PFAS color palette
+  scale_fill_manual(values = pfas_colors) + 
+  
+  # Figure styling and layout
+  theme_minimal() +                             
+  theme(
+    axis.title.y = element_text(                
+      size = 12,
+      face = "bold",
+      color = "black",
+      family = "Times"),
+    axis.text.x  = element_text(                
+      size = 12,
+      face = "bold",
+      color = "black",
+      family = "Times"),
+    axis.text.y  = element_text(                
+      size = 12,
+      color = "black",
+      family = "Times"),
+    legend.position = "none", # Hiding the legend (PFAS names are already labeled on the x-axis)
+    panel.grid.major = element_blank(),         
+    panel.grid.minor = element_blank(),         
+    panel.border = element_blank(),             
+    axis.line.x.bottom = element_line(          
+      linewidth = 0.5,
+      color = "black"),
+    axis.line.y.left = element_line(            
+      linewidth = 0.5,
+      color = "black"),
+    axis.ticks.y = element_line(                
+      linewidth = 0.5,
+      color = "black"),
+    axis.ticks.length = unit(0.2, "cm"),
+    panel.background = element_rect(
+      fill = "white", 
+      color = NA),
+    plot.title = element_text(                 
+      face   = "bold",
+      size   = 13,
+      family = "Times",
+      hjust  = 0.4))
+```
+
+Because PFAS concentrations differ substantially in scale across compounds, PFAS with smaller concentration ranges can be difficult to interpret from the violins alone. To address this, I display a median (IQR) table beneath the plot, providing a numeric summary for each PFAS that remains readable regardless of scale differences. I do this using the following code:
+```{r Violin_Plots3}
 # Creating a table to display under the plot with median and IQR
-table_plot <- ggplot() +
+table_plot = ggplot() +
   geom_text(data = pfas_medians,
-    aes(x = Chemical, y = 0, label = "Median (IQR)"),
-    size = 4.5, hjust = 0.5, vjust = -0.5,
-    fontface = "bold", family = "Times") +
+    aes(x = Chemical, 
+        y = 0, 
+        label = "Median (IQR)"),
+    size = 4, 
+    hjust = 0.5, 
+    vjust = -2,
+    fontface = "bold", 
+    family = "Times") +
   geom_text(data = pfas_medians,
-    aes(x = Chemical, y = 0, label = Median_IQR),
-    size = 4, hjust = 0.5, vjust = 1,
+    aes(
+      x = Chemical, 
+      y = 0, 
+      label = Median_IQR),
+    size = 3.5, 
+    hjust = 0.5, 
+    vjust = 0,
     family = "Times") +
   scale_x_discrete(limits = PFAS_order) +
   theme_void() +
-  theme(plot.margin = margin(0, 0, 0, 0, "cm"))
+  theme(plot.margin = margin(0, 0, 0, 1.8, "cm"))
+```
 
-# Making the violin plot + boxplot overlay (cap y-axis at 30)
-violin_plot <- ggplot(pfas_long, aes(x = Chemical, y = Concentration, fill = Chemical)) +
-  geom_violin(trim = FALSE, scale = "width", adjust = 1.2, color = "black") +
-  geom_boxplot(width = 0.4, fill = "white", alpha = 0.4, outlier.shape = NA, color = "black") +
-  scale_fill_manual(values = pfas_colors) +
-  labs(x = NULL, y = expression(bold("Concentration (ng/mL)"))) +
-  labs(title = paste(
-      strwrap("Figure 2. Concentrations of maternal serum PFAS in the HOME Study (2003 to 2006; N = 264)", width = 70), collapse = "\n"), x = NULL, y = NULL) +
-  theme_minimal() +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(size = 12, face = "bold", color = "black", family = "Times"),
-    axis.text.x  = element_text(size = 12, face = "bold", color = "black", family = "Times"),
-    axis.text.y  = element_text(size = 12, color = "black", family = "Times"),
-    legend.position = "none",
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.border = element_blank(),
-    axis.line.x.bottom = element_line(linewidth = 0.5, color = "black"),
-    axis.line.y.left = element_line(linewidth = 0.5, color = "black"),
-    axis.ticks.y = element_line(linewidth = 0.5, color = "black"),
-    axis.ticks.length = unit(0.2, "cm"),
-    panel.background = element_rect(fill = NA, color = "white"),
-    plot.title = element_text(
-    face   = "bold",
-    size   = 13,
-    family = "Times",
-    hjust  = 0.4))
+Finally, I combine the violin plots and the median (IQR) table into a single figure.
+```{r Violin_Plots4}
 # Combining with the median (IQR) table with my violin plot
-final_violin <- ggarrange(violin_plot, table_plot, ncol = 1, heights = c(4, 1))
+final_violin = ggarrange(violin_plot, table_plot, ncol = 1, heights = c(4, 1))
 print(final_violin)
 ```
 
 <h3 style="text-align: center"> 4.3. Study Characteristics Table </h3>
-Table 1 summarizes maternal and household characteristics for participants included in the HOME Study cohort (2003–2006). Descriptive statistics were calculated using the full covariate dataset to reflect the underlying study population, consistent with standard epidemiologic reporting practices.
+Table 1 summarizes maternal and household characteristics in our cohort. Descriptive statistics were calculated using the full covariate dataset to reflect the underlying study population, consistent with standard epidemiologic reporting practices.
 
-Continuous variables are presented as medians with interquartile ranges (IQR) to account for skewed distributions, while categorical variables are summarized using counts and percentages calculated among non-missing observations. Key characteristics include maternal age at delivery, race/ethnicity, gestational tobacco exposure (measured via cotinine concentrations at approximately 16 weeks’ gestation), household income, and parity.
+Continuous variables are presented as medians with interquartile ranges (IQR) to account for skewed distributions, while categorical variables are summarized using counts and percentages (calculated among non-missing observations). Key characteristics include maternal age at delivery, race/ethnicity, gestational tobacco exposure (measured via cotinine concentrations at approximately 16 weeks’ gestation), household income, and parity.
 
-This table serves to contextualize the cohort prior to downstream metabolome-wide analyses. A thorough evaluation of covariate functional forms (including assessment of linearity and alternative parameterizations) was conducted separately and is briefly described in the methods section of my paper [(Hall et al.)](https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515).
+A comprehensive evaluation of covariate functional forms (including exploratory data analysis, assessment of linearity assumptions, and comparison of alternative modeling strategies using metrics such as AUC) was conducted separately and is briefly summarized in the Methods section of my paper. [(Hall et al.)](https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515).
 ```{r Covariate_Table, results='asis', echo=TRUE}
 # Note. This plot uses the non–log-transformed PFAS data that were previously imported for the correlation heatmap. The corresponding data import step is commented out below and provided for reference and reuse.
-
+#
 # Importing the file containing the non-transformed pfas data
-#full_cov_pfas <- read.csv(file.path(data_dir, "pfas_not_transformed.csv"))
+#full_cov_pfas = read.csv(file.path(data_dir, "pfas_not_transformed.csv"))
 
-# Creating the sample size used for Table 1
-N <- nrow(full_cov_pfas)
+# Calculating the sample size used for Table 1
+N = nrow(full_cov_pfas)
 
 # Formatting continuous variables as Median [IQR]
-med_iqr <- function(x, digits = 1) {
+med_iqr = function(x, digits = 1) {
   sprintf(
     paste0("%.", digits, "f [%.", digits, "f–%.", digits, "f]"),
     median(x, na.rm = TRUE),
-    stats::quantile(x, 0.25, na.rm = TRUE),
-    stats::quantile(x, 0.75, na.rm = TRUE))
-}
+    quantile(x, 0.25, na.rm = TRUE),
+    quantile(x, 0.75, na.rm = TRUE))}
 
 # Formatting categorical variables as N (%), excluding missing values from the denominator
-n_pct <- function(cond) {
-  n <- sum(cond, na.rm = TRUE)
-  p <- mean(cond, na.rm = TRUE) * 100
-  sprintf("%d (%.1f%%)", n, p)
-}
+n_pct = function(cond) {
+  n = sum(cond, na.rm = TRUE)
+  p = mean(cond, na.rm = TRUE) * 100
+  sprintf("%d (%.1f%%)", n, p)}
 
-# Creating the Table 1 structure (row labels + formatted summaries)
-table1 <- tibble::tibble(
+# Creating the Table 1 structure (row labels and formatted summaries)
+table1 = tibble(
   Characteristic = c(
     "Number of participants",
     "Maternal age at delivery (years)",
@@ -1178,36 +1277,36 @@ table1 <- tibble::tibble(
     n_pct(full_cov_pfas$parity == "Parous")))
 
 # Creating the table
-base_css  <- "font-family: Times; color: black; background-color: white;"
-title_css <- "font-family: Times; color: black; font-size: 1.15em;"
-table_title <- "Table 1. Maternal characteristics among participants in the HOME Study (2003 to 2006)"
-knitr::kable(table1,
+base_css  = "font-family: Times; color: black; background-color: white;"
+title_css = "font-family: Times; color: black; font-size: 1.15em;"
+table_title = "Table 1. Maternal characteristics among participants in the HOME Study (2003 to 2006)"
+kable(table1,
   format = "html",
   escape = TRUE,
-  table.attr = "style='background-color: white; width: 60%; margin-left: 0;'") |>
+  table.attr = "style='background-color: white; width: 60%; margin-left: 0;'") %>%
   kableExtra::kable_styling(
     full_width = FALSE,
     position   = "center",
-    font_size  = 15) |>
+    font_size  = 15) %>%
   # Adding the title as a header row
-kableExtra::add_header_above(setNames(2, table_title),
+  kableExtra::add_header_above(setNames(2, table_title),
   bold = TRUE,
   background = "white",
-  extra_css = title_css) |>
+  extra_css = title_css) %>%
   # Setting column widths (adjust as needed)
-  kableExtra::column_spec(1, width = "66%", extra_css = base_css) |>
-  kableExtra::column_spec(2, width = "34%", extra_css = base_css) |>
+  kableExtra::column_spec(1, width = "66%", extra_css = base_css) %>%
+  kableExtra::column_spec(2, width = "34%", extra_css = base_css) %>%
   # Forcing Times + black text + white fill everywhere
-  kableExtra::row_spec(0, background = "white", extra_css = base_css) |>
+  kableExtra::row_spec(0, background = "white", extra_css = base_css) %>%
   kableExtra::row_spec(1:nrow(table1), background = "white", extra_css = base_css)
 ```
 
-<h2 style="text-align: center"> **5. Metabolome-Wide Association Study- Figures** </h2>
-For the metabolome-wide association study (MWAS), volcano plots were used to screen thousands of metabolomic features and highlight those with both the largest estimated associations with prenatal PFAS exposure (effect size) and the strongest statistical evidence after multiple-testing correction. This visualization facilitates rapid prioritization of candidate metabolites for downstream annotation and pathway enrichment by jointly displaying magnitude of association and statistical significance.
+<h2 style="text-align: center"> **5. Metabolome-Wide Association Study: Figures** </h2>
+For the metabolome-wide association study (MWAS), volcano plots were used to screen thousands of metabolomic features. These plots highlight those with both the largest estimated associations with prenatal PFAS exposure (effect size) and the strongest statistical evidence after multiple-testing correction. This visualization facilitates rapid prioritization of candidate metabolites for downstream annotation and pathway enrichment by jointly displaying magnitude of association and statistical significance.
 
-To account for the large number of simultaneous tests inherent to MWAS, statistical significance was evaluated using the Benjamini–Hochberg (BH) procedure to control the false discovery rate (FDR), defined as the expected proportion of false positives among features identified as significant. BH was selected because it provides principled error control while preserving power in high-dimensional discovery settings such as metabolomics, where more conservative family-wise error approaches (e.g., Bonferroni) can be overly restrictive.
+To account for the large number of simultaneous tests inherent to MWAS, statistical significance was evaluated using the Benjamini–Hochberg (BH) procedure to control the false discovery rate (FDR). The FDR, also referred to as Type I error, can be defined as the expected proportion of false positives among features identified as significant. BH was selected because it provides principled error control while preserving power in high-dimensional discovery settings such as metabolomics, where more conservative family-wise error approaches (e.g., Bonferroni) can be overly restrictive.
 
-An FDR threshold of 0.20 was used to emphasize discovery and candidate prioritization rather than definitive inference, with the goal of carrying forward a manageable subset of features for downstream annotation and pathway enrichment.
+An FDR threshold of 0.20 was used to emphasize discovery-oriented feature screening rather than definitive inference. This aligns with the study's objective of prioritizing metabolites and pathways for subsequent modeling and validation using more specialized approaches.
 
 For visualization, a horizontal FDR significance threshold was drawn in red on each volcano plot and defined as:
 \[\begin{aligned}\small\left(\frac{\text{number of significant values}}{\text{number of total values}}\right)\times 0.2\end{aligned}\]
@@ -1216,237 +1315,141 @@ This was then transformed to the -log10 scale for visualization. Features exceed
 
 <h3 style="text-align: center"> 5.1. 4-PFAS Mixture Volcano Plot </h3>
 
-For the 4-PFAS mixture, a volcano plot was created to display metabolome-wide association results for the joint effect of prenatal exposure to the four PFAS compounds. Each point represents a metabolomic feature, plotted by its estimated effect size (log2-fold change in ion intensity) on the x-axis and the strength of statistical evidence on the y-axis (-log10 scale)
+For the 4-PFAS mixture, a volcano plot was created to display metabolome-wide association results for the joint effect of prenatal exposure to the four PFAS compounds. Each point represents a metabolomic feature, plotted by its estimated effect size (log2-fold change in ion intensity) on the x-axis and the strength of statistical evidence on the y-axis (-log10 scale). This code was adapted from **Elvira Fleury's original code**.
 ```{r 4-PFAS-Volcano}
-# Calculating the number of significant values for the 4-PFAS mixture
+# Calculating the number of significant values
 n_sig_4 = nrow(qg_comp_4_SIG)
-# Calculating the total number of values in the 4-PFAS analysis
+
+# Calculating the total number of values
 n_total_4 = nrow(qg_comp_4_FULL)
 
-# Converting an FDR=0.20–scaled p-value cutoff (0.2 × proportion significant) into the volcano plot y-value (-log10 p) for the horizontal “significance” line.
-threshold <- -log10(n_sig_4 /n_total_4 * 0.2) #(significant/total N)*p-value
+# Computing the volcano plot significance threshold 
+threshold = -log10((n_sig_4 / n_total_4) * 0.2)
 
 # Creating the volcano plot for the 4-PFAS mixture
-pfas_mwas <- ggplot() +
-# Adding grey points below the line
-geom_point(data = subset(qg_comp_4_FULL, -log10(p.value) <= threshold), aes(x = psi, y = -log10(p.value)), color = "darkgray") +
+pfas_mwas = ggplot() +
+  # Adding grey points below the line
+  geom_point(data = subset(qg_comp_4_FULL, -log10(p.value) <= threshold), 
+             aes(
+               x = psi, 
+               y = -log10(p.value)), 
+             color = "darkgray") +
   # Adding red points to better identify significant values (above the line)
-  geom_point(data = subset(qg_comp_4_FULL, -log10(p.value) > threshold), aes(x = psi, y = -log10(p.value)), color = "red") +
+  geom_point(data = subset(qg_comp_4_FULL, -log10(p.value) > threshold), 
+               aes(
+                 x = psi, 
+                 y = -log10(p.value)), 
+               color = "red") +
   # Adding a horizontal line to denote significance threshold
-  geom_hline(yintercept = threshold, color = "red", linetype = "dashed") +
-  # Adding labels and titles
-  labs(title = paste(strwrap("Figure 3. Cord blood metabolic features associated with a mixture of 4 PFAS during gestation in the HOME Study (2003 to 2006, N = 264)", width = 70), collapse = "\n"), 
-       x = "Log2-Fold Change in Ion Intensity",
-       y = "-Log10 (p-value)") +
+  geom_hline(
+      yintercept = threshold, 
+      color = "red", 
+      linetype = "dashed") +
+    # Adding labels and titles
+    labs(
+      title = paste(strwrap("Figure 3. Cord blood metabolic features associated with a mixture of 4 PFAS during gestation in the HOME Study (2003 to 2006, N = 264)", 
+              width = 70), 
+              collapse = "\n"), 
+         x = "Log2-Fold Change in Ion Intensity",
+         y = "-Log10 (p-value)") +
   # Applying a black and white theme
   theme_bw() +
   # Modifying the theme to remove x-axis grid lines and set font and axis color
   theme(
-    panel.grid.major.x = element_blank(), 
-    panel.grid.minor.x = element_blank(),
-    text = element_text(family = "Times"),
-    axis.text = element_text(colour = "black"),
-    axis.ticks = element_line(colour = "black"),
-    plot.title = element_text(face   = "bold", size   = 13, family = "Times", hjust  = 0.4))
+      panel.grid.major.x = element_blank(), 
+      panel.grid.minor.x = element_blank(),
+      text = element_text(family = "Times"),
+      axis.text = element_text(colour = "black"),
+      axis.ticks = element_line(colour = "black"),
+      plot.title = element_text(
+        face   = "bold", 
+        size   = 13, 
+        family = "Times", 
+        hjust  = 0.4))
 
 # Printing the plot
 print(pfas_mwas)
 ```
 <h3 style="text-align: center"> 5.2. Single-PFAS Volcano Plots </h3>
-To examine compound-specific associations, volcano plots were generated separately for each of the four individual PFAS included in the mixture. Each plot displays metabolomic features by estimated effect size and statistical significance, allowing direct comparison of association patterns across compounds.
+To examine compound-specific associations, volcano plots were generated separately for each of the four individual PFAS included in the 4-PFAS mixture. Each plot displays metabolomic features by estimated effect size and statistical significance, allowing direct comparison of association patterns across compounds.
 
-The individual volcano plots were created using a consistent modeling and visualization framework and then combined into a single figure using the ggpubr package to facilitate side-by-side comparison. The code for each individual plot and its corresponding output are shown below.
+The individual volcano plots were created using a consistent modeling and visualization framework implemented through a reusable plotting function. These individual plots were then combined into a single figure using the ggpubr package to facilitate side-by-side comparison. The code for each individual plot and its corresponding output are shown below. 
 
-<h4 style="text-align: center"> 5.2.1 Single-PFAS Volcano Plots:PFOA (Plot 1 of 4)</h4>
+<h4 style="text-align: center"> 5.2.1 Single-PFAS Volcano Plots</h4>
+<br>
 ```{r Single-PFAS-Volcano-PFOA}
-# Calculating the number of significant values for the PFOA MWAS
-n_sig_PFOA = nrow(PFOA_SIG)
-# Calculating the total number of values in the PFOA MWAS
-n_total_PFOA = nrow(PFOA_Full)
+# Creating a function that will create a volcano plot for each PFAS of interest
+make_single_pfas_volcano = function(full_df, sig_df, pfas_label,
+                                     effect_col = "Beta",
+                                     p_col = "p.value",
+                                     fdr_alpha = 0.2) {
+  # Calculating the number of significant values
+  n_sig = nrow(sig_df)
+  # Calculating the total number of values
+  n_total = nrow(full_df)
+  # Computing the volcano plot significance threshold
+  scaled_p = pmax((n_sig / n_total) * fdr_alpha, .Machine$double.xmin)
+  threshold = -log10(scaled_p)
+  # Creating a plotting dataset that flags points above the threshold
+  plot_df = full_df %>%
+    mutate(
+      neglog10_p = -log10(pmax(full_df[[p_col]], .Machine$double.xmin)),
+      is_sig = neglog10_p > threshold)
+  # Copying the effect-size column into a standard column
+  plot_df$effect = plot_df[[effect_col]]
+  # Creating the volcano plot
+  ggplot(plot_df, ggplot2::aes(
+    x = effect, 
+    y = neglog10_p)) +
+    geom_point(ggplot2::aes(color = is_sig)) +
+    scale_color_manual(
+      values = c(`FALSE` = "darkgray", `TRUE` = "red"), 
+      guide = "none") +
+    geom_hline(
+      yintercept = threshold, color = "red", 
+      linetype = "dashed") +
+    labs(
+      title = pfas_label,
+      x = "Log2 Fold Change in Ion Intensity",
+      y = "-Log10 (p-value)") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        text = element_text(family = "Times"),
+        axis.text = element_text(colour = "black"),
+        axis.ticks = element_line(colour = "black"),
+        plot.title = element_text(size = 11))}
 
-# Converts an FDR=0.20–scaled p-value cutoff (0.2 × proportion significant) into the volcano plot y-value (-log10 p) for the horizontal “significance” line.
-threshold <- -log10(n_sig_PFOA /n_total_PFOA * 0.2) #(significant/total N)*p-value
-
-# Creating the volcano plot for PFOA
-pfoa_mwas_plot <- ggplot() +
-  # Adding grey points below the line
-  geom_point(
-    data = subset(PFOA_Full, -log10(p.value) <=threshold), 
-    aes(x = Beta, y = -log10(p.value)), 
-    color = "darkgray") +
-  # Adding red points above the line
-  geom_point(
-    data = subset(PFOA_Full, -log10(p.value) > threshold), 
-    aes(x = Beta, y = -log10(p.value)), 
-    color = "red") +
-  # Adding a horizontal line to denote significance threshold
-  geom_hline(
-    yintercept = threshold, 
-    color = "red", 
-    linetype = "dashed") +
-  # Adding labels and titles
-  labs(
-    x = "Log2-Fold Change in Ion Intensity", 
-    y = "-Log10 (p-value)", 
-    title = "a. PFOA") +
-  # Applying a black and white theme
-  theme_bw() +
-  # Modifying the theme to remove x-axis grid lines and set font and axis color
-  theme(
-    panel.grid.major.x = element_blank(), 
-    panel.grid.minor.x = element_blank(),
-    text = element_text(family = 'Times'),
-    axis.text = element_text(colour = "black"),
-    axis.ticks = element_line(colour = "black"),
-    plot.title = element_text(size = 11))
+# Generating volcano plots for each PFAS
+pfoa_mwas_plot  = make_single_pfas_volcano(PFOA_Full,  PFOA_SIG,  "a. PFOA")
+pfna_mwas_plot  = make_single_pfas_volcano(PFNA_Full,  PFNA_SIG,  "b. PFNA")
+pfhxs_mwas_plot = make_single_pfas_volcano(PFHxS_Full, PFHxS_SIG, "c. PFHxS")
+pfos_mwas_plot  = make_single_pfas_volcano(PFOS_Full,  PFOS_SIG,  "d. PFOS")
 ```
-
-<h4 style="text-align: center"> 5.2.2 Single-PFAS Volcano Plots:PFNA (Plot 2 of 4)</h4>
-```{r Single-PFAS-Volcano-PFNA}
-# Calculating the number of significant values for the PFNA MWAS
-n_sig_PFNA = nrow(PFNA_SIG)
-# Calculating the total number of values in the PFOS MWAS
-n_total_PFNA = nrow(PFNA_Full)
-
-# Converting an FDR=0.20–scaled p-value cutoff (0.2 × proportion significant) into the volcano plot y-value (-log10 p) for the horizontal “significance” line.
-threshold <- -log10(n_sig_PFNA /n_total_PFNA * 0.2) #(significant/total N)*p-value
-
-# Creating the volcano plot for PFNA
-pfna_mwas_plot <- ggplot() +
-  # Adding grey points below the line
-  geom_point(
-    data = subset(PFNA_Full, -log10(p.value) <=threshold), 
-    aes(x = Beta, y = -log10(p.value)), 
-    color = "darkgray") +
-  # Adding red points above the line
-  geom_point(
-    data = subset(PFNA_Full, -log10(p.value) > threshold), 
-    aes(x = Beta, y = -log10(p.value)), 
-    color = "red") +
-  # Adding a horizontal line to denote significance threshold
-  geom_hline(
-    yintercept = threshold, 
-    color = "red", 
-    linetype = "dashed") +
-  # Adding labels and titles
-  labs(
-    x = "Log2-Fold Change in Ion Intensity", 
-    y = "-Log10 (p-value)", 
-    title = "b. PFNA") +
-  # Applying a black and white theme
-  theme_bw() +
-  # Modifying the theme to remove x-axis grid lines and set font and axis color
-  theme(
-    panel.grid.major.x = element_blank(), 
-    panel.grid.minor.x = element_blank(),
-    text = element_text(family = 'Times'),
-    axis.text = element_text(colour = "black"),
-    axis.ticks = element_line(colour = "black"),
-    plot.title = element_text(size = 11))
-```
-
-<h4 style="text-align: center"> 5.2.3 Single-PFAS Volcano Plots:PFHxS (Plot 3 of 4)</h4>
-```{r Single-PFAS-Volcano-PFHxS}
-# Calculating the number of significant values for the PFNA MWAS
-n_sig_PFHxS = nrow(PFHxS_SIG)
-# Calculating the total number of values in the PFOS MWAS
-n_total_PFHxS = nrow(PFHxS_Full)
-
-# Converts an FDR=0.20–scaled p-value cutoff (0.2 × proportion significant) into the volcano plot y-value (-log10 p) for the horizontal “significance” line.
-threshold <- -log10(n_sig_PFHxS /n_total_PFHxS * 0.2) #(significant/total N)*p-value
-
-# Creating the volcano plot for PFNA
-pfhxs_mwas_plot <- ggplot() +
-  # Add grey points below the line
-  geom_point(
-    data = subset(PFHxS_Full, -log10(p.value) <=threshold), 
-    aes(x = Beta, y = -log10(p.value)), 
-    color = "darkgray") +
-  # Add red points above the line
-  geom_point(
-    data = subset(PFHxS_Full, -log10(p.value) > threshold), 
-    aes(x = Beta, y = -log10(p.value)), 
-    color = "red") +
-  # Add horizontal line to denote significance threshold
-  geom_hline(
-    yintercept = threshold, 
-    color = "red", 
-    linetype = "dashed") +
-  # Add labels and titles
-  labs(
-    x = "Log2-Fold Change in Ion Intensity", 
-    y = "-Log10 (p-value)", 
-    title = "c. PFHxS") +
-  # Apply black and white theme
-  theme_bw() +
-  # Modify theme to remove x-axis grid lines and set font and axis color
-  theme(
-    panel.grid.major.x = element_blank(), 
-    panel.grid.minor.x = element_blank(),
-    text = element_text(family = 'Times'),
-    axis.text = element_text(colour = "black"),
-    axis.ticks = element_line(colour = "black"),
-    plot.title = element_text(size = 11))
-```
-
-<h4 style="text-align: center"> 5.2.4 Single-PFAS Volcano Plots:PFOS (Plot 4 of 4)</h4>
-```{r Single-PFAS-Volcano-PFOS}
-# Calculating the number of significant values for the PFOS MWAS
-n_sig_PFOS = nrow(PFOS_SIG)
-# Calculating the total number of values in the PFOS MWAS
-n_total_PFOS = nrow(PFOS_Full)
-
-# Converts an FDR=0.20–scaled p-value cutoff (0.2 × proportion significant) into the volcano plot y-value (-log10 p) for the horizontal “significance” line.
-threshold <- -log10(n_sig_PFOS /n_total_PFOS * 0.2) #(significant/total N)*p-value
-
-# Creating the volcano plot for PFOS
-pfos_mwas_plot <- ggplot() +
-  # Add grey points below the line
-  geom_point(
-    data = subset(PFOS_Full, -log10(p.value) <=threshold), 
-    aes(x = Beta, y = -log10(p.value)), 
-    color = "darkgray") +
-  # Add red points above the line
-  geom_point(
-    data = subset(PFOS_Full, -log10(p.value) > threshold), 
-    aes(x = Beta, y = -log10(p.value)), 
-    color = "red") +
-  # Add horizontal line to denote significance threshold
-  geom_hline(
-    yintercept = threshold, 
-    color = "red", 
-    linetype = "dashed") +
-  # Add labels and titles
-  labs(
-    x = "Log2-Fold Change in Ion Intensity", 
-    y = "-Log10 (p-value)", 
-    title = "d. PFOS") +
-  # Apply black and white theme
-  theme_bw() +
-  # Modify theme to remove x-axis grid lines and set font and axis color
-  theme(
-    panel.grid.major.x = element_blank(), 
-    panel.grid.minor.x = element_blank(),
-    text = element_text(family = 'Times'),
-    axis.text = element_text(colour = "black"),
-    axis.ticks = element_line(colour = "black"),
-    plot.title = element_text(size = 11))
-```
-
-<h4 style="text-align: center"> 2.2.5 Single-PFAS volcano plots:Final Plot</h4>
+<br>
+<h4 style="text-align: center"> 2.2.2 Single-PFAS volcano plots: final plot</h4>
 After volcano plots for each individual PFAS were created, I knitted them together using the ggarrange() function. For this Figure, I specified there should be 2 figures per row. 
 ```{r Single-PFAS-Volcano-Knitted}
 # Using ggpubr to put individual PFAS volcano plots together 
-individ_mwas<- ggarrange(pfoa_mwas_plot, pfna_mwas_plot, pfhxs_mwas_plot, pfos_mwas_plot,
-          ncol=2, nrow=2)
+individ_mwas = ggarrange(
+  pfoa_mwas_plot, 
+  pfna_mwas_plot, 
+  pfhxs_mwas_plot, 
+  pfos_mwas_plot,
+  ncol = 2, 
+  nrow = 2)
+
 # Adding a title to the arranged figure
-individ_mwas <- ggpubr::annotate_figure(
+individ_mwas = annotate_figure(
   individ_mwas,
-  top = ggpubr::text_grob(
-    paste(
-      strwrap("Figure 4. Metabolic features associated with maternal PFAS concentrations in the HOME Study (2003 to 2006, N = 264)", width = 70),
-      collapse = "\n"),
-    face = "bold", family = "Times", size = 12))
+  top = text_grob(
+    paste(strwrap("Figure 4. Metabolic features associated with maternal PFAS concentrations in the HOME Study (2003 to 2006, N = 264)", 
+          width = 70), 
+          collapse = "\n"),
+    face = "bold", 
+    family = "Times", 
+    size = 12))
 
 # Printing out the plots
 print(individ_mwas)
@@ -1456,16 +1459,17 @@ print(individ_mwas)
 
 As a sensitivity analysis, I generated a volcano plot for a 5-PFAS mixture that included MeFOSAA in addition to the original 4-PFAS mixture (PFOS, PFOA, PFNA, and PFHxS). This figure mirrors the primary MWAS volcano plot and is used to assess whether inclusion of MeFOSAA alters the overall pattern of effect sizes or the set of statistically prioritized metabolomic features.
 ```{r 5-PFAS-Volcano}
-# Calculating the number of significant values for the 4-PFAS mixture
+# Calculating the number of significant values
 n_sig_5 = nrow(qg_comp_5_SIG)
-# Calculating the total number of values in the 4-PFAS analysis
+
+# Calculating the total number of values
 n_total_5 = nrow(qg_comp_5_FULL)
 
-# Converts an FDR=0.20–scaled p-value cutoff (0.2 × proportion significant) into the volcano plot y-value (-log10 p) for the horizontal “significance” line.
-threshold <- -log10(n_sig_5 /n_total_5 * 0.2) #(significant/total N)*p-value
+# Computing the volcano plot's significance threshold
+threshold = -log10((n_sig_5 / n_total_5) * 0.2)
 
-# Creating the volcano plot for the 4-PFAS mixture
-mefosaa_mwas <- ggplot() +
+# Creating the volcano plot
+mefosaa_mwas = ggplot() +
   # Adding grey points below the line
   geom_point(
     data = subset(qg_comp_5_FULL, -log10(p.value) <= threshold), 
@@ -1482,8 +1486,9 @@ mefosaa_mwas <- ggplot() +
     color = "red", 
     linetype = "dashed") +
   # Adding labels and titles
-  # Adding labels and titles
-  labs(title = paste(strwrap("Figure 5. Sensitivity analysis of the association between metabolic features and a mixture of 5 PFAS (4 PFAS mixture + MeFOSAA) in the HOME Study (2003 to 2006, N = 264)", width = 70), collapse = "\n"), 
+  labs(title = paste(strwrap("Figure 5. Sensitivity analysis of the association between metabolic features and a mixture of 5 PFAS (4 PFAS mixture + MeFOSAA) in the HOME Study (2003 to 2006, N = 264)", 
+       width = 70), 
+       collapse = "\n"), 
        x = "Log2-Fold Change in Ion Intensity",
        y = "-Log10 (p-value)") +
   # Applying the black and white theme
@@ -1495,122 +1500,173 @@ mefosaa_mwas <- ggplot() +
     text = element_text(family = "Times"),
     axis.text = element_text(colour = "black"),
     axis.ticks = element_line(colour = "black"),
-    plot.title = element_text(face   = "bold", size   = 13, family = "Times", hjust  = 0.4))
+    plot.title = element_text(
+      face= "bold", 
+      size   = 13, 
+      family = "Times", 
+      hjust  = 0.4))
 
-# Print the plot
+# Printing the plot
 print(mefosaa_mwas)
 ```
 
 <h2 style="text-align: center"> **6. Pathway Enrichment Analysis-Figures** </h2>
 
-In this section, I provide the code used to generate the bubble plots. This code was adapted from **Elvira Fleury's original code** and extended to incorporate KEGG BRITE pathways and to overlay individual PFAS results alongside the 4-PFAS mixture with other minor modifications.
+In this section, I provide the code used to generate the bubble plots seen in my first-author paper. [(Hall et al.)](https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515). This code was adapted from **Elvira Fleury's original code** and extended to incorporate KEGG BRITE pathways and to overlay individual PFAS results alongside the 4-PFAS mixture with other minor modifications.
 
 Bubble plots were used to summarize pathway-level results because they simultaneously convey statistical significance and enrichment strength across many pathways. In these figures, the x-axis reflects statistical evidence, point size represents enrichment magnitude, and color distinguishes exposure models, allowing efficient comparison of pathway patterns across mixtures and individual PFAS.
 
 <h3 style="text-align: center"> 6.1. Bubble Plot (4-PFAS Mixture & Single PFAS) </h3>
-This bubble plot summarizes metabolic pathways enriched in association with the 4-PFAS mixture (PFOS, PFOA, PFNA, PFHxS) based on mummichog pathway enrichment analysis. Each point represents a metabolic pathway, with horizontal position reflecting statistical evidence and point size indicating enrichment strength.
+This bubble plot summarizes metabolic pathways enriched in association with the 4-PFAS mixture (PFOS, PFOA, PFNA, PFHxS), showing results for both the overall mixture and individual PFAS based on mummichog pathway enrichment analysis. The figure is restricted to pathways that were significantly enriched for the 4-PFAS mixture. Results for individual PFAS are overlaid solely to contextualize the mixture-level findings and to assess which compounds most likely drive the observed pathway associations.
 
-Pathways were ordered by statistical significance for the 4-PFAS mixture and grouped according to superpathways defined in the KEGG BRITE database [(KEGG BRITE Database)](https://www.genome.jp/kegg/brite.html). Superpathway brackets were added manually as a presentation layer to improve readability; all pathway ordering and enrichment statistics are unchanged.
+Pathways were ordered by statistical significance for the 4-PFAS mixture and grouped according to superpathways defined in the KEGG BRITE database [(KEGG BRITE Database)](https://www.genome.jp/kegg/brite.html). Superpathway brackets were added manually as a presentation layer to improve readability; pathway ordering and enrichment statistics are unchanged.
 
 Overall, the plot highlights pathways most consistently implicated by the PFAS mixture, providing a pathway-level summary that complements feature-level MWAS results and helps prioritize biological processes for downstream interpretation.
-```{r Individual_BubblePlot_4_PFAS, warning=FALSE, message=FALSE}
-# Creating a helper function to preserve a consistent factor order.
-add_levels <- function(x, levels) {
-  levels <- unique(c(levels, x))
-  factor(x, levels = levels)
-}
 
-# Importing the data I need for the 4-PFAS Mixture mixture and locking in the order for pathways
-mummi_for_plot <- read.csv(file.path(analyses_data_dir, "2023.06.04.mummi_4pfas_res.csv"))
-mummi_for_plot$X1 <- add_levels(mummi_for_plot$X1, mummi_for_plot$Pathway)
+In order to make this figure, I first align the pathway enrichment results from the individual PFAS analyses to the pathway universe and ordering defined by the 4-PFAS mixture. This step ensures that all pathways appear on a shared y-axis and that comparisons across compounds are made on an identical set of pathways. This was accomplished as follows:
+```{r Individual_BubblePlot_4_PFAS_part1, warning=FALSE, message=FALSE}
+# Importing the data I need for the 4-PFAS mixture and locking in the order for pathways
+mummi_for_plot = read.csv(file.path(analyses_data_dir, "2023.06.04.mummi_4pfas_res.csv"))
+mummi_for_plot$X1 = factor(mummi_for_plot$X1, levels = unique(mummi_for_plot$X1))
 
-# Creating a new 'skeleton copy' of the 4-PFAS dataset
-blank <- mummi_for_plot
-blank[, -(1:3)] <- NA
+# Importing the full individual-PFAS mummichog results and aligning them to the mixture pathway set
+analyses_data_dir = file.path(analyses_root, "Data")
+mummi_for_plot_ind = read.csv(file.path(analyses_data_dir, "individual.csv"))
 
+# Keeping only the pathways that also appear in the mixture results
+mummi_for_plot_ind = subset(mummi_for_plot_ind, Pathway %in% mummi_for_plot$Pathway)
 
-# Importing the full individual-PFAS mummichog results, then aligning them to the mixture pathway set so all plots share the same pathway universe and y-axis analyses_data_dir <- file.path(analyses_root, "Data")
-mummi_for_plot_ind <- read.csv(file.path(analyses_data_dir, "individual.csv"))
+# Dropping the existing X1
+  # we re-attach X1 from the mixture results to enforce consistent factor ordering
+mummi_for_plot_ind = subset(mummi_for_plot_ind, select = -X1)
 
-# Keeping only the pathways that also appear in the mixture results (so comparisons are apples-to-apples)
-mummi_for_plot_ind <- subset(mummi_for_plot_ind, Pathway %in% mummi_for_plot$Pathway)
+# Merging in the mixture-derived X1 index
+mummi_for_plot_ind = merge(mummi_for_plot_ind, mummi_for_plot[, c("Pathway", "X1")], by = "Pathway")
 
-# Droping the existing X1 (we re-attach X1 from the mixture results to enforce consistent factor ordering)
-mummi_for_plot_ind <- subset(mummi_for_plot_ind, select = -X1)
-
-# Merging in the mixture-derived X1 index so individual PFAS results inherit the same y-axis pathway order
-mummi_for_plot_ind <- merge(mummi_for_plot_ind, mummi_for_plot[, c("Pathway", "X1")], by = "Pathway")
-
-# Removing rows with missing values (typically introduced by filtering/merging) before plotting
-mummi_for_plot_ind <- na.omit(mummi_for_plot_ind)
-
+# Removing rows with missing values
+mummi_for_plot_ind = na.omit(mummi_for_plot_ind)
 
 # Individual PFAS
-# Creating a dataset with all NAs except Pathways and removing datasets
-pfas_map <- mummi_for_plot[!duplicated(mummi_for_plot$X1), 1:3]
-  pfas_map$X1 <- factor(pfas_map$X1)
-pfas_map_X1 <- data.frame(X1 = pfas_map[, 1])
+# Creating a mapping of unique pathway indices (X1) to ensure all PFAS layers share the same y-axis structure
+pfas_map = mummi_for_plot[!duplicated(mummi_for_plot$X1), 1:3]
+pfas_map$X1 = factor(pfas_map$X1)
+pfas_map_X1 = data.frame(X1 = pfas_map[, 1])
 
 # PFOS
-pfos_for_plot <- mummi_for_plot_ind %>% filter(PFAS == 'PFOS')
-    pfos_for_plot<-pfos_for_plot[!is.na(pfos_for_plot$PFAS),]
-    pfos_for_plot <- merge (pfos_for_plot, pfas_map_X1, by="X1", all=TRUE)
-# PFNA
-pfna_for_plot <- mummi_for_plot_ind %>% filter(PFAS == 'PFNA')
-    pfna_for_plot<-pfna_for_plot[!is.na(pfna_for_plot$PFAS),]
-    pfna_for_plot <- merge (pfna_for_plot, pfas_map_X1, by="X1", all=TRUE)
-# PFHxS
-pfhxs_for_plot <- mummi_for_plot_ind %>% filter(PFAS == 'PFHxS')
-    pfhxs_for_plot<-pfhxs_for_plot[!is.na(pfhxs_for_plot$PFAS),]
-    pfhxs_for_plot <- merge (pfhxs_for_plot, pfas_map_X1, by="X1", all=TRUE)
-# PFOA
-pfoa_for_plot <- mummi_for_plot_ind %>% filter(PFAS == 'PFOA')
-    pfoa_for_plot<-pfoa_for_plot[!is.na(pfoa_for_plot$PFAS),]
-    pfoa_for_plot <- merge (pfoa_for_plot, pfas_map_X1, by="X1", all=TRUE)
+pfos_for_plot = mummi_for_plot_ind %>% filter(PFAS == 'PFOS')
+    pfos_for_plot=pfos_for_plot[!is.na(pfos_for_plot$PFAS),]
+    pfos_for_plot = merge (pfos_for_plot, pfas_map_X1, by="X1", all=TRUE)
 
+# PFNA
+pfna_for_plot = mummi_for_plot_ind %>% filter(PFAS == 'PFNA')
+    pfna_for_plot=pfna_for_plot[!is.na(pfna_for_plot$PFAS),]
+    pfna_for_plot = merge (pfna_for_plot, pfas_map_X1, by="X1", all=TRUE)
+
+# PFHxS
+pfhxs_for_plot = mummi_for_plot_ind %>% filter(PFAS == 'PFHxS')
+    pfhxs_for_plot=pfhxs_for_plot[!is.na(pfhxs_for_plot$PFAS),]
+    pfhxs_for_plot = merge (pfhxs_for_plot, pfas_map_X1, by="X1", all=TRUE)
+
+# PFOA
+pfoa_for_plot = mummi_for_plot_ind %>% filter(PFAS == 'PFOA')
+    pfoa_for_plot=pfoa_for_plot[!is.na(pfoa_for_plot$PFAS),]
+    pfoa_for_plot = merge (pfoa_for_plot, pfas_map_X1, by="X1", all=TRUE)
+``` 
+
+After this, I generate a layered bubble plot that overlays the 4-PFAS mixture results with the results for each individual PFAS, using consistent axis scaling, pathway ordering, and visual encoding.
+```{r Individual_BubblePlot_4_PFAS_part2, warning=FALSE, message=FALSE}
 # Creating a plot
-theme_set(theme_bw(base_size = 12, base_family = "Times New Roman"))
+theme_set(theme_bw(
+  base_size = 12, 
+  base_family = "Times"))
 
 # Mixture bubble plot with all the individual chemicals
 # Plot using ggplot
-four_ind_mummi <- ggplot() +
-geom_point(data = pfoa_for_plot, aes(x = -log10(Gamma), y = X1, size = Hits.sig / Expected, color = "PFOA")) + # PFOA LAYER
-  geom_point(data = pfna_for_plot, aes(x = -log10(Gamma), y = X1, size = Hits.sig / Expected, color = "PFNA")) + # PFNA LAYER
-  geom_point(data = pfhxs_for_plot, aes(x = -log10(Gamma), y = X1, size = Hits.sig / Expected, color = "PFHxS")) + # PFHxS LAYER
-  geom_point(data = pfos_for_plot, aes(x = -log10(Gamma), y = X1, size = Hits.sig / Expected, color = "PFOS")) + # PFOS LAYER
-  geom_point (data=mummi_for_plot, aes(x = -log10(Gamma), y = X1, size = Hits.sig / Expected, color = "4-PFAS Mixture")) + #4-PFAS mixture level
-  scale_size_continuous(guide = guide_legend(title = "Enrichment Factor")) +
-  labs(x = "-Log10 (p-value)", 
-       y = "", 
-       color = "Type of PFAS") + # plot labels
-  scale_color_manual(values = c("4-PFAS Mixture" = "black", 
-                                "PFOA" = "#3C8DC4", "PFNA" = "#FF9A3F", 
-                                "PFHxS" = "#942E2E", "PFOS" = "hotpink"), # manually set colors
-                     breaks = c("4-PFAS Mixture", "PFOA", "PFNA", "PFHxS", "PFOS")) + # manually set order of PFAS to be consistent 
-  scale_y_discrete(labels = mummi_for_plot$Pathway) + # Set x-axis labels to unique "Pathway" values
-    scale_x_continuous(expand =  c(0, 0), limits = c(1, 2.6), breaks = seq(1, 2.5, 0.5)) +
-  theme(legend.position = "bottom", 
-        plot.title = element_text(face = "bold", size = 14, hjust = 0.5), 
-        plot.subtitle = element_text(size = 14, hjust = 0.5),
-        axis.title.y = element_text(size = 14),
-        axis.title.x = element_text(size = 14),
-        axis.text = element_text(color = "black"),
-        axis.text.x = element_text(size = 14), 
-        axis.text.y = element_text(size = 14, color = "black"),
-        axis.ticks.y = element_blank(), 
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size = 14),
-        legend.box = "vertical")
+four_ind_mummi = ggplot() +
+  # PFOA layer
+  geom_point(data = pfoa_for_plot, 
+             aes(x = -log10(Gamma), 
+                 y = X1, 
+                 size = Hits.sig / Expected, 
+                 color = "PFOA")) +
+  # PFNA layer
+  geom_point(data = pfna_for_plot, 
+             aes(x = -log10(Gamma), 
+                 y = X1, 
+                 size = Hits.sig / Expected, 
+                 color = "PFNA")) +
+  # PFHxS layer
+    geom_point(data = pfhxs_for_plot, 
+               aes(x = -log10(Gamma), 
+                   y = X1, 
+                   size = Hits.sig / Expected, 
+                   color = "PFHxS")) + 
+  # PFOS layer
+  geom_point(data = pfos_for_plot, 
+             aes(x = -log10(Gamma), 
+                 y = X1, 
+                 size = Hits.sig / Expected, 
+                 color = "PFOS")) +
+  # 4-PFAS mixture layer
+  geom_point (data=mummi_for_plot, 
+              aes(x = -log10(Gamma), 
+                  y = X1, 
+                  size = Hits.sig / Expected, 
+                  color = "4-PFAS Mixture")) +
+  # Mapping the point size to the enrichment factor and labeling the size of the legend for interpretation
+    scale_size_continuous(guide = guide_legend(title = "Enrichment Factor")) +
+  # Creating the plot labels
+    labs(x = "-Log10 (p-value)", 
+         y = "", 
+         color = "Type of PFAS") + # Plot labels
+  # Adding in the color scale
+    scale_color_manual(values = c(
+                                  "4-PFAS Mixture" = "#000000", 
+                                  "PFOA" = "#3C8DC4", 
+                                  "PFNA" = "#FF9A3F", 
+                                  "PFHxS" = "#942E2E", 
+                                  "PFOS" = "#FF69B4"),
+                       breaks = c(
+                                  "4-PFAS Mixture", 
+                                  "PFOA", 
+                                  "PFNA", 
+                                  "PFHxS", 
+                                  "PFOS")) + # Manually setting the order of PFAS to be consistent 
+    # Labeling the y-axis (ordered by X1) with the corresponding pathway names for readability
+    scale_y_discrete(labels = mummi_for_plot$Pathway) + 
+    # Setting a fixed x-axis range and tick marks (and remove extra padding) for consistent visual comparisons
+    scale_x_continuous(expand =  c(0, 0), 
+                       limits = c(1, 2.6), 
+                       breaks = seq(1, 2.5, 0.5)) +
+    # Figure styling and layout
+    theme(legend.position = "bottom", 
+          plot.title = element_text(
+            face = "bold", 
+            size = 14, 
+            hjust = 0.5), 
+          plot.subtitle = element_text(size = 14, hjust = 0.5),
+          axis.title.y = element_text(size = 14),
+          axis.title.x = element_text(size = 14),
+          axis.text = element_text(color = "black"),
+          axis.text.x = element_text(size = 14), 
+          axis.text.y = element_text(size = 14, color = "black"),
+          axis.ticks.y = element_blank(), 
+          legend.title = element_text(size = 14),
+          legend.text = element_text(size = 14),
+          legend.box = "vertical")
 ```
 <br> 
 <br>
 After running this code, the resulting figure will appear as shown below.
 <br>
+<br>
 ```{r Individual_BubblePlot_4_PFAS_Render, warning=FALSE, message=FALSE, fig.width=12, fig.height=15, dpi=200, out.widtheval=TRUE, echo=FALSE}
 print(four_ind_mummi)
 ```
 
-An important note, for plots with many or long pathway labels, adjusting figure dimensions (particularly height) may be necessary for readability. This can be done either by specifying dimensions in Quarto or when exporting the plot (e.g., with ggsave()). 
+Note: Pathways are grouped by superpathway, with visual spacing between groups. Within each group, pathways are ranked by the 4-PFAS mixture enrichment factor (highest to lowest).
+
+For plots with many or long pathway labels, adjusting figure dimensions (especially height) may be necessary for readability. This can be done either by specifying dimensions in Quarto or when exporting the plot (e.g., with <code>ggsave()</code>).
 
 After generating the base bubble plot, KEGG BRITE superpathway brackets were added manually as a post-processing annotation. The final figure is shown below.
 ```{r Individual_BubblePlot_Final, echo=FALSE, fig.align="center"}
@@ -1618,34 +1674,52 @@ knitr::include_graphics("Figures/4-PFAS Mixture Bubbleplot.png")
 ```
 
 <h3 style="text-align: center"> 6.2. Sensitivity Analysis Bubble Plot </h3>
-As a sensitivity analysis, this bubble plot summarizes pathway enrichment results for a 5-PFAS mixture that includes MeFOSAA. Using the same analytic steps as the primary mixture and individual-PFAS pathway analyses, the figure compares these results with those from the 4-PFAS mixture to evaluate whether the biological pathways implicated by prenatal PFAS exposure remain consistent when MeFOSAA is included, providing a pathway-level assessment of robustness to mixture specification.
+This bubble plot accompanies the sensitivity analysis comparing pathway enrichment results from the primary 4-PFAS mixture (PFOA, PFOS, PFHxS, PFNA) with an expanded 5-PFAS mixture that includes MeFOSAA. Details of this analysis are described in Section 3.4 (Sensitivity PEA: 5-PFAS).
+
+The figure displays pathway enrichment results from both mixtures, allowing direct comparison of pathway-level patterns across exposure definitions. This comparison evaluates whether inclusion of MeFOSAA alters the pathways implicated by the primary mixture.
+
+Using the same analytic steps as the primary mixture and individual-PFAS pathway analyses (Section 6.1), this figure provides a pathway-level assessment of robustness to mixture specification.
+
 ```{r 5PFAS_BubblePlot, warning=FALSE, message=FALSE, fig.width=10, fig.height=15, dpi=200}
-theme_set(theme_bw(base_size = 12, base_family = "Times New Roman"))
+# Setting the theme
+theme_set(theme_bw(base_size = 12, base_family = "Times"))
 
-# Loading in the mixture data
-# 5-PFAS Mixture
-mummi_for_plot_5 <- read.csv(file.path(analyses_data_dir,"2023.07.19.mummi_5PFAS with 4-PFAS pathways too.csv"))
+# Importing 5-PFAS mixture data
+mummi_for_plot_5 = read.csv(file.path(analyses_data_dir,"2023.07.19.mummi_5PFAS with 4-PFAS pathways too.csv"))
 
-# 4-PFAS Mixture
-mummi_for_plot_4 <- read.csv(file.path(analyses_data_dir,"2023.07.19.mummi_4PFAS with 5-PFAS pathways too.csv"))
+# Importing 4-PFAS mixture data
+mummi_for_plot_4 = read.csv(file.path(analyses_data_dir,"2023.07.19.mummi_4PFAS with 5-PFAS pathways too.csv"))
 
-# 5-PFAS Mixture bubble plot 
-
-# Converting X1 to an ordered factor (in its current row order) so ggplot preserves the intended pathway ordering on the y-axis for both the 4-PFAS and 5-PFAS datasets.
-mummi_for_plot_5$X1 <- factor(mummi_for_plot_5$X1, levels = unique(mummi_for_plot_5$X1))
-mummi_for_plot_4$X1 <- factor(mummi_for_plot_4$X1, levels = unique(mummi_for_plot_4$X1))
+# Converting X1 to an ordered factor (in its current row order)
+mummi_for_plot_5$X1 = factor(mummi_for_plot_5$X1, levels = unique(mummi_for_plot_5$X1))
+mummi_for_plot_4$X1 = factor(mummi_for_plot_4$X1, levels = unique(mummi_for_plot_4$X1))
 
 # Plotting using ggplot
-mummi5 <- ggplot() +
-  geom_point(data = mummi_for_plot_4, aes(x = -log10(Gamma), y = X1, size = Hits.sig / Expected, color="4PFAS")) + #4PFAS layer 
-geom_point(data = mummi_for_plot_5, aes(x = -log10(Gamma), y = X1, size = Hits.sig / Expected, color="5PFAS")) + #5PFAS layer 
+mummi5 = ggplot() +
+  # 4-PFAS layer
+  geom_point(
+    data = mummi_for_plot_4, 
+    aes(x = -log10(Gamma), 
+        y = X1, 
+        size = Hits.sig / Expected, 
+        color="4PFAS")) +  
+  # 5-PFAS layer
+  geom_point(
+    data = mummi_for_plot_5, 
+    aes(x = -log10(Gamma), 
+        y = X1, 
+        size = Hits.sig / Expected, 
+        color="5PFAS")) + 
+  # Mapping the point size to the enrichment factor and labeling the size of the legend
   scale_size_continuous(guide = guide_legend(title = "Enrichment Factor")) +
-  labs(x = "-Log10 (p-value)", y = "", color = "Type of PFAS") +
+  labs(x = "-Log10 (p-value)", y = "", color = "PFAS Mixture") +
     scale_color_manual(
-    values = c("4PFAS" = "black", "5PFAS" = "hotpink"),
+    values = c("4PFAS" = "#000000", "5PFAS" = "#FF69B4"),
     breaks = c("4PFAS", "5PFAS"),
     labels = c("4-PFAS Mixture", "5-PFAS Mixture")) +
-  scale_y_discrete(labels = mummi_for_plot_5$Pathway) +
+   # Labeling the y-axis (ordered by X1) with the corresponding pathway names for readability
+  scale_y_discrete(labels = setNames(mummi_for_plot_5$Pathway, mummi_for_plot_5$X1)) +
+  # Figure styling and layout
   theme(legend.position = "bottom", 
         plot.title = element_text(face = "bold", size = 14, hjust = 0.5), 
         plot.subtitle = element_text(size = 14, hjust = 0.5),
@@ -1665,38 +1739,56 @@ knitr::include_graphics("Figures/5-PFAS Mixture Bubbleplot.png")
 ```
 
 <h3 style="text-align: center"> 6.3. Pathway Overlap Venn Diagram </h3>
-To compare pathway signals across individual PFAS, I created a Venn diagram summarizing overlap in significantly enriched pathways (p(Gamma) < 0.05) for PFOA, PFNA, PFHxS, and PFOS. This visualization highlights which pathways are shared across PFAS versus those that appear more compound-specific, providing a quick summary of consistency in pathway enrichment patterns across the individual exposure models.
+To compare pathway signals across individual PFAS, I created a Venn diagram summarizing overlap in significantly enriched pathways (p(Gamma) < 0.05) for PFOA, PFNA, PFHxS, and PFOS. This code is a slight modification of the **original code written by Elvira Fleury**. 
+
+This visualization highlights pathways that are shared across PFAS as well as those that appear more compound-specific. Together, these overlaps provide a concise summary of consistency in pathway enrichment patterns across individual exposure models.
 ```{r venn_plot, warning=FALSE, message=FALSE, fig.width=12, fig.height=9, dpi=300}
 # Creating list of PFAS to include for the Venn diagram 
-mummi_list <- list(
+mummi_list = list(
   PFOA  = unique(na.omit(pfoa_for_plot$Pathway)),
   PFNA  = unique(na.omit(pfna_for_plot$Pathway)),
   PFHxS = unique(na.omit(pfhxs_for_plot$Pathway)),
   PFOS  = unique(na.omit(pfos_for_plot$Pathway)))
 
 # Creating the Venn Diagram
-venn <- ggvenn(
+venn = ggvenn(
   mummi_list,
-  fill_color = c("#3C8DC4", "#FF9A3F", "#942E2E", "hotpink"),
+  fill_color = c(
+    "#3C8DC4", 
+    "#FF9A3F", 
+    "#942E2E", 
+    "#FF69B4"),
   stroke_size = 0.5,
   set_name_size = 4,
   text_size = 3.5) +
   labs(title = paste(
-    strwrap("Figure 8. Venn diagram of metabolic pathways associated with 4 PFAS in the HOME study (2003 to 2006; N=264)", width = 70),
+    strwrap("Figure 8. Venn diagram of metabolic pathways associated with 4 PFAS in the HOME study (2003 to 2006; N=264)", 
+    width = 70),
     collapse = '\n'), 
     subtitle = "Pathways with p(Gamma) < 0.05") +
-  theme(plot.margin = margin(t = 30, r = 10, b = 10, l = 10),
-        plot.title = element_text(family = "Times", size = 18, face = "bold", hjust = 0.5),
-        plot.subtitle = element_text(family = "Times", size = 16, hjust = 0.5))
+  theme(plot.margin = margin(
+    t = 30, 
+    r = 10, 
+    b = 10, 
+    l = 10),
+    plot.title = element_text(
+      family = "Times", 
+      size = 18, 
+      face = "bold", 
+      hjust = 0.5),
+    plot.subtitle = element_text(
+      family = "Times", 
+      size = 16, 
+      hjust = 0.5))
 
 print(venn)
 ```
 <br><br>
 <h1 style="text-align: center;">**Acknowledgments**</h1>
-I would like to thank my coauthors: Elvira Fleury, Katherine E. Manz, George D. Papandonatos, Jessie P. Buckley, Kim M. Cecil, Aimin Chen, Bruce P. Lanphear, Kimberly Yolton, Douglas I. Walker, Kurt D. Pennell, and Joseph M. Braunfor their contributions to the publication of this research.
+I would like to thank my coauthors: Elvira Fleury, George D. Papandonatos, Jessie P. Buckley, Kim M. Cecil, Aimin Chen, Bruce P. Lanphear, Kimberly Yolton, Douglas I. Walker, Kurt D. Pennell, Joseph M. Braun, and Katherine E. Manz for their contributions to the publication of this research.
 <br>
 <br>
-I would specifically like to acknowledge **Elvira Fleury**, who contributed code for selected figures and collaborated with me on portions of the MWAS and MetaboAnalystR/mummichog pathway enrichment analysis (PEA) workflow.
+I would specifically like to acknowledge **Elvira Fleury**, who contributed code for many of the figures included and who and collaborated with me on portions of the MWAS and MetaboAnalystR/mummichog pathway enrichment analysis (PEA) workflow.
 
 
 
